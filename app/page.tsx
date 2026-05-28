@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import {
@@ -20,10 +21,6 @@ import {
   BarChart3,
   ShieldCheck,
   CheckCircle2,
-  AlertTriangle,
-  Flame,
-  ChevronRight,
-  ExternalLink,
 } from "lucide-react";
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -248,8 +245,11 @@ export default function Home() {
   useEffect(() => {
     if (!isShowcaseInView) return;
 
-    setScanStep(0);
-    setTypedLogs([]);
+    // Reset simulator state
+    const resetTimer = setTimeout(() => {
+      setScanStep(0);
+      setTypedLogs([]);
+    }, 0);
 
     const logs = [
       "Initializing EcoLoop diagnostic engine...",
@@ -273,7 +273,10 @@ export default function Home() {
       }
     }, 900);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(resetTimer);
+      clearInterval(interval);
+    };
   }, [isShowcaseInView, selectedDevice]);
 
   return (
@@ -283,8 +286,8 @@ export default function Home() {
           1. NAVBAR
           ========================================== */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-          ? "border-b border-slate-800 bg-[#0F172A]/85 backdrop-blur-md py-4 shadow-lg shadow-black/20"
-          : "border-b border-transparent bg-transparent py-6"
+        ? "border-b border-slate-800 bg-[#0F172A]/85 backdrop-blur-md py-4 shadow-lg shadow-black/20"
+        : "border-b border-transparent bg-transparent py-6"
         }`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
@@ -307,12 +310,12 @@ export default function Home() {
 
           {/* Desktop CTA */}
           <div className="hidden md:block">
-            <ScrollLink
-              href="#showcase"
+            <Link
+              href="/submit"
               className="inline-flex h-10 items-center justify-center rounded-lg bg-green-600 px-5 text-sm font-semibold text-slate-950 hover:bg-green-500 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               Start Recovery
-            </ScrollLink>
+            </Link>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -389,7 +392,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="mt-6 text-center text-lg sm:text-xl text-slate-400 max-w-2xl leading-relaxed font-normal"
           >
-            EcoLoop classifies your phone's condition using AI, then routes it to resale, refurbishment, parts recovery, or recycling — automatically.
+            EcoLoop classifies your phone&apos;s condition using AI, then routes it to resale, refurbishment, parts recovery, or recycling — automatically.
           </motion.p>
 
           <motion.div
@@ -704,8 +707,8 @@ export default function Home() {
                 <button
                   onClick={() => setSelectedDevice("phone")}
                   className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-205 ${selectedDevice === "phone"
-                      ? "bg-green-600 text-slate-950 shadow"
-                      : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+                    ? "bg-green-600 text-slate-950 shadow"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
                     }`}
                 >
                   iPhone 13 Pro
@@ -713,8 +716,8 @@ export default function Home() {
                 <button
                   onClick={() => setSelectedDevice("laptop")}
                   className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-205 ${selectedDevice === "laptop"
-                      ? "bg-green-600 text-slate-950 shadow"
-                      : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+                    ? "bg-green-600 text-slate-950 shadow"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
                     }`}
                 >
                   MacBook Air
@@ -722,8 +725,8 @@ export default function Home() {
                 <button
                   onClick={() => setSelectedDevice("tablet")}
                   className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-205 ${selectedDevice === "tablet"
-                      ? "bg-green-600 text-slate-950 shadow"
-                      : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+                    ? "bg-green-600 text-slate-950 shadow"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800"
                     }`}
                 >
                   iPad Pro
