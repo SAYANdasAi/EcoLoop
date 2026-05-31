@@ -36,3 +36,26 @@ html {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+:root {
+  --font-display: var(--font-syne);
+  --font-body: var(--font-space-grotesk);
+  --font-ui: var(--font-outfit);
+  --font-mono: var(--font-jetbrains-mono);
+}
+body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+h1, h2, h3 { font-family: var(--font-display); }
+code, pre, .font-mono { font-family: var(--font-mono); }
+.text-gradient {
+  background: linear-gradient(135deg, #fff 0%, #4ade80 50%, #fff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientSweep 4s linear infinite;
+}
+@keyframes gradientSweep {
+  0%   { background-position: 0% center }
+  100% { background-position: 200% center }
+}
+.glow-green { text-shadow: 0 0 20px rgba(74,222,128,0.4), 0 0 40px rgba(74,222,128,0.2); }
+

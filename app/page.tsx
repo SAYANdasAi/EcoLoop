@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
@@ -21,7 +20,14 @@ import {
   BarChart3,
   ShieldCheck,
   CheckCircle2,
+  Recycle,
+  Package,
+  ShoppingCart,
 } from "lucide-react";
+import { WordReveal } from "../components/animations/WordReveal";
+import { GlowText } from "../components/animations/GlowText";
+import { FadeUp } from "../components/animations/FadeUp";
+import { FloatCard } from "../components/animations/FloatCard";
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -356,132 +362,144 @@ export default function Home() {
       {/* ==========================================
           2. HERO SECTION
           ========================================== */}
-      <section className="relative min-h-screen bg-[#0F172A] flex flex-col justify-center pt-32 pb-20 overflow-hidden">
+      <header className="relative h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/[0.05] z-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#080808] z-10" />
+        <div className="relative z-20 flex flex-col items-center text-center px-6">
+          <WordReveal
+            className="text-5xl md:text-7xl font-bold"
+            text="Turn Your E-Waste Into Opportunity"
+            greenWords={["E-Waste"]}
+          />
 
-        {/* Subtle green radial glow behind the hero heading */}
-        <div className="absolute inset-0 hero-glow opacity-60 pointer-events-none" />
+          <FadeUp delay={0.8}>
+            <p className="mt-6 text-lg md:text-xl text-white/55 max-w-3xl font-body">
+              EcoLoop uses AI to determine the best second life for your used
+              electronics. Get paid for your old devices and contribute to a
+              circular economy.
+            </p>
+          </FadeUp>
 
-        {/* Dynamic decorative grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0a_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0a_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full flex flex-col items-center">
-
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/5 px-4 py-1.5 text-xs sm:text-sm font-semibold tracking-wide text-green-400 backdrop-blur-sm"
-          >
-            <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            AI-Powered Circular Electronics Platform
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-center text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.1] sm:leading-[1.05]"
-          >
-            Give your old devices <br className="hidden sm:inline" />
-            <span className="text-green-500">a second life.</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-6 text-center text-lg sm:text-xl text-slate-400 max-w-2xl leading-relaxed font-normal"
-          >
-            EcoLoop classifies your phone&apos;s condition using AI, then routes it to resale, refurbishment, parts recovery, or recycling — automatically.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
-          >
-            <ScrollLink
-              href="#showcase"
-              className="inline-flex h-12 items-center justify-center rounded-xl bg-green-600 px-8 text-base font-semibold text-slate-950 shadow-lg shadow-green-900/20 hover:bg-green-500 hover:scale-[1.02] active:scale-[0.98] transition-all"
-            >
-              Submit Your Device
-            </ScrollLink>
-            <ScrollLink
-              href="#marketplace"
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/50 backdrop-blur-sm px-8 text-base font-semibold text-white hover:bg-slate-800 hover:border-slate-600 hover:scale-[1.02] active:scale-[0.98] transition-all"
-            >
-              Explore Marketplace
-            </ScrollLink>
-          </motion.div>
-
-          {/* Stat Row */}
-          <div className="w-full mt-24 pt-12 border-t border-slate-800/80">
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-8"
-            >
-              {/* Stat 1 */}
-              <motion.div variants={fadeInUp} className="text-center md:text-left flex flex-col">
-                <span className="text-3xl sm:text-4xl font-extrabold text-white flex items-center justify-center md:justify-start">
-                  <Counter value={70} />%
-                </span>
-                <span className="text-sm font-medium text-slate-400 mt-2">Recovery Rate</span>
-              </motion.div>
-
-              {/* Stat 2 */}
-              <motion.div variants={fadeInUp} className="text-center md:text-left flex flex-col">
-                <span className="text-3xl sm:text-4xl font-extrabold text-white flex items-center justify-center md:justify-start">
-                  <Counter value={4} /> Outcome Options
-                </span>
-                <span className="text-sm font-medium text-slate-400 mt-2">Instead of 1 (Recycling)</span>
-              </motion.div>
-
-              {/* Stat 3 */}
-              <motion.div variants={fadeInUp} className="text-center md:text-left flex flex-col">
-                <span className="text-3xl sm:text-4xl font-extrabold text-white flex items-center justify-center md:justify-start">
-                  B2C + C2B + B2B
-                </span>
-                <span className="text-sm font-medium text-slate-400 mt-2">Universal Marketplace</span>
-              </motion.div>
-
-              {/* Stat 4 */}
-              <motion.div variants={fadeInUp} className="text-center md:text-left flex flex-col">
-                <span className="text-3xl sm:text-4xl font-extrabold text-white flex items-center justify-center md:justify-start gap-1">
-                  Real-Time
-                </span>
-                <span className="text-sm font-medium text-slate-400 mt-2">Device Journey Tracking</span>
-              </motion.div>
-            </motion.div>
-          </div>
-
+          <FadeUp delay={1.0}>
+            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
+              <Link
+                href="/submit"
+                className="bg-green-400 text-black font-ui font-bold text-lg px-8 py-4 rounded-xl shadow-[0_0_40px_rgba(74,222,128,0.4)]"
+              >
+                Start AI Appraisal
+              </Link>
+              <Link
+                href="#process"
+                className="border border-white/10 font-ui font-medium px-8 py-4 rounded-xl"
+              >
+                Learn More <ArrowRight className="inline -mt-1" size={16} />
+              </Link>
+            </div>
+          </FadeUp>
         </div>
-      </section>
+
+        <div className="absolute bottom-0 left-0 right-0 h-96 z-20 pointer-events-none">
+          <div className="relative w-full h-full">
+            <FloatCard
+              amplitude={10}
+              duration={4}
+              rotate={3}
+              delay={0.5}
+            >
+              <div className="absolute bottom-20 left-[10%] w-48 h-24 bg-[#0f0f0f] border border-white/10 rounded-2xl p-4 flex items-center space-x-3">
+                <Recycle size={32} className="text-green-400" />
+                <div>
+                  <h4 className="font-ui font-bold">Recycle</h4>
+                  <p className="text-xs text-white/50 font-mono">
+                    Safely extract raw materials.
+                  </p>
+                </div>
+              </div>
+            </FloatCard>
+            <FloatCard
+              amplitude={15}
+              duration={5}
+              rotate={-2}
+              delay={1.0}
+            >
+              <div className="absolute bottom-40 left-[25%] w-52 h-24 bg-[#0f0f0f] border border-white/10 rounded-2xl p-4 flex items-center space-x-3">
+                <Wrench size={32} className="text-blue-400" />
+                <div>
+                  <h4 className="font-ui font-bold">Refurbish</h4>
+                  <p className="text-xs text-white/50 font-mono">
+                    Repair and restore to mint condition.
+                  </p>
+                </div>
+              </div>
+            </FloatCard>
+            <FloatCard
+              amplitude={12}
+              duration={4.5}
+              rotate={4}
+              delay={0.2}
+            >
+              <div className="absolute bottom-32 right-[22%] w-56 h-24 bg-[#0f0f0f] border border-white/10 rounded-2xl p-4 flex items-center space-x-3">
+                <Package size={32} className="text-yellow-400" />
+                <div>
+                  <h4 className="font-ui font-bold">Parts Harvest</h4>
+                  <p className="text-xs text-white/50 font-mono">
+                    Salvage working components for resale.
+                  </p>
+                </div>
+              </div>
+            </FloatCard>
+            <FloatCard
+              amplitude={18}
+              duration={6}
+              rotate={-3}
+              delay={0.8}
+            >
+              <div className="absolute bottom-10 right-[8%] w-52 h-24 bg-[#0f0f0f] border border-white/10 rounded-2xl p-4 flex items-center space-x-3">
+                <ShoppingCart size={32} className="text-purple-400" />
+                <div>
+                  <h4 className="font-ui font-bold">Resell</h4>
+                  <p className="text-xs text-white/50 font-mono">
+                    List on marketplaces for direct resale.
+                  </p>
+                </div>
+              </div>
+            </FloatCard>
+          </div>
+        </div>
+      </header>
 
       {/* ==========================================
           3. HOW IT WORKS
           ========================================== */}
-      <section id="how-it-works" className="relative py-28 bg-white text-slate-900 overflow-hidden">
+      <section id="how-it-works" className="relative py-28 bg-[#080808] text-white overflow-hidden">
+        {/* Subtle radial gradient background */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(22,163,74,0.05)_0%,transparent_75%)] opacity-30 z-0" />
+        {/* Dynamic decorative grid overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0a_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 pointer-events-none" />
+
         <div className="max-w-7xl mx-auto px-6 relative z-10">
 
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-base font-semibold tracking-wider text-green-600 uppercase">Seamless Lifecycle</h2>
-            <h3 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mt-3">
-              How the circular loop works.
-            </h3>
-            <p className="mt-4 text-lg text-slate-500 leading-relaxed">
-              We turn the linear model of &quot;buy, use, dump&quot; into a self-sustaining cycle in five steps.
-            </p>
+            <FadeUp delay={0.2}>
+              <h2 className="font-mono text-xs sm:text-sm font-medium tracking-widest text-green-400 uppercase mb-2">Seamless Lifecycle</h2>
+            </FadeUp>
+            <FadeUp delay={0.4}>
+              <h3 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-3">
+                How the circular loop works.
+              </h3>
+            </FadeUp>
+            <FadeUp delay={0.6}>
+              <p className="mt-4 text-lg text-white/70 leading-relaxed font-body">
+                We turn the linear model of &quot;buy, use, dump&quot; into a self-sustaining cycle in five steps.
+              </p>
+            </FadeUp>
           </div>
 
           {/* Steps Timeline Row */}
           <div className="relative">
 
             {/* Horizontal Line for Desktop (md and up) */}
-            <div className="hidden md:block absolute top-12 left-12 right-12 h-0.5 bg-slate-100 pointer-events-none z-0">
+            <div className="hidden md:block absolute top-12 left-12 right-12 h-0.5 bg-slate-700 pointer-events-none z-0">
               <motion.div
                 initial={{ width: 0 }}
                 whileInView={{ width: "100%" }}
@@ -491,75 +509,79 @@ export default function Home() {
               />
             </div>
 
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-4 relative z-10"
-            >
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-4 relative z-10">
 
               {/* Step 1 */}
-              <motion.div variants={fadeInUp} className="flex flex-col items-center text-center px-4">
-                <div className="w-20 h-20 rounded-full bg-slate-50 border-2 border-slate-100 flex items-center justify-center text-slate-900 relative shadow-sm group-hover:border-green-500 transition-colors">
-                  <span className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center">1</span>
-                  <Truck className="w-8 h-8 text-green-600" />
+              <FadeUp delay={0.7}>
+                <div className="flex flex-col items-center text-center px-4">
+                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
+                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">1</span>
+                    <Truck className="w-9 h-9" />
+                  </div>
+                  <h4 className="font-ui text-lg font-bold text-white mt-6">Device Pickup</h4>
+                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
+                    Schedule a home pickup or print a pre-paid shipping label.
+                  </p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-900 mt-6">Device Pickup</h4>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-[200px]">
-                  Schedule a home pickup or print a pre-paid shipping label.
-                </p>
-              </motion.div>
+              </FadeUp>
 
               {/* Step 2 */}
-              <motion.div variants={fadeInUp} className="flex flex-col items-center text-center px-4">
-                <div className="w-20 h-20 rounded-full bg-slate-50 border-2 border-slate-100 flex items-center justify-center text-slate-900 relative shadow-sm">
-                  <span className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center">2</span>
-                  <Cpu className="w-8 h-8 text-green-600" />
+              <FadeUp delay={0.8}>
+                <div className="flex flex-col items-center text-center px-4">
+                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
+                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">2</span>
+                    <Cpu className="w-9 h-9" />
+                  </div>
+                  <h4 className="font-ui text-lg font-bold text-white mt-6">AI Evaluation</h4>
+                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
+                    AI scans component grades, battery health, and chassis marks.
+                  </p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-900 mt-6">AI Evaluation</h4>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-[200px]">
-                  AI scans component grades, battery health, and chassis marks.
-                </p>
-              </motion.div>
+              </FadeUp>
 
               {/* Step 3 */}
-              <motion.div variants={fadeInUp} className="flex flex-col items-center text-center px-4">
-                <div className="w-20 h-20 rounded-full bg-slate-50 border-2 border-slate-100 flex items-center justify-center text-slate-900 relative shadow-sm">
-                  <span className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center">3</span>
-                  <Layers className="w-8 h-8 text-green-600" />
+              <FadeUp delay={0.9}>
+                <div className="flex flex-col items-center text-center px-4">
+                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
+                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">3</span>
+                    <Layers className="w-9 h-9" />
+                  </div>
+                  <h4 className="font-ui text-lg font-bold text-white mt-6">Route Decision</h4>
+                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
+                    Automatic routing to refurbish, resale, parts, or recycling.
+                  </p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-900 mt-6">Route Decision</h4>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-[200px]">
-                  Automatic routing to refurbish, resale, parts, or recycling.
-                </p>
-              </motion.div>
+              </FadeUp>
 
               {/* Step 4 */}
-              <motion.div variants={fadeInUp} className="flex flex-col items-center text-center px-4">
-                <div className="w-20 h-20 rounded-full bg-slate-50 border-2 border-slate-100 flex items-center justify-center text-slate-900 relative shadow-sm">
-                  <span className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center">4</span>
-                  <ShoppingBag className="w-8 h-8 text-green-600" />
+              <FadeUp delay={1.0}>
+                <div className="flex flex-col items-center text-center px-4">
+                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
+                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">4</span>
+                    <ShoppingBag className="w-9 h-9" />
+                  </div>
+                  <h4 className="font-ui text-lg font-bold text-white mt-6">Marketplace Listing</h4>
+                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
+                    Devices and salvaged parts are listed instantly to B2B/B2C hubs.
+                  </p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-900 mt-6">Marketplace Listing</h4>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-[200px]">
-                  Devices and salvaged parts are listed instantly to B2B/B2C hubs.
-                </p>
-              </motion.div>
+              </FadeUp>
 
               {/* Step 5 */}
-              <motion.div variants={fadeInUp} className="flex flex-col items-center text-center px-4">
-                <div className="w-20 h-20 rounded-full bg-slate-50 border-2 border-slate-100 flex items-center justify-center text-slate-900 relative shadow-sm">
-                  <span className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center">5</span>
-                  <Coins className="w-8 h-8 text-green-600" />
+              <FadeUp delay={1.1}>
+                <div className="flex flex-col items-center text-center px-4">
+                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
+                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">5</span>
+                    <Coins className="w-9 h-9" />
+                  </div>
+                  <h4 className="font-ui text-lg font-bold text-white mt-6">Reuse & Earn</h4>
+                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
+                    Get cash back immediately while keeping rare earth minerals in use.
+                  </p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-900 mt-6">Reuse & Earn</h4>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-[200px]">
-                  Get cash back immediately while keeping rare earth minerals in use.
-                </p>
-              </motion.div>
+              </FadeUp>
 
-            </motion.div>
+            </div>
           </div>
 
         </div>
