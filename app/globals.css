@@ -59,3 +59,71 @@ code, pre, .font-mono { font-family: var(--font-mono); }
 }
 .glow-green { text-shadow: 0 0 20px rgba(74,222,128,0.4), 0 0 40px rgba(74,222,128,0.2); }
 
+/* EcoLoop Jaw-Dropping Animations & Tech Styling */
+
+@keyframes laserSweep {
+  0% { top: 0%; opacity: 0.4; }
+  50% { top: 100%; opacity: 1; }
+  100% { top: 0%; opacity: 0.4; }
+}
+
+@keyframes gridGlow {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes signalPulse {
+  0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+  70% { transform: scale(1.15); opacity: 0.5; box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
+  100% { transform: scale(1); opacity: 0; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+.laser-active {
+  animation: laserSweep 3s infinite ease-in-out;
+}
+
+.tech-grid {
+  background-size: 24px 24px;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+
+.tech-grid-glow {
+  animation: gridGlow 8s infinite ease-in-out;
+}
+
+.glow-spotlight {
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.border-glow-premium {
+  position: relative;
+}
+.border-glow-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.pulse-target {
+  position: relative;
+}
+.pulse-target::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  animation: signalPulse 1.8s infinite ease-out;
+}
+
+

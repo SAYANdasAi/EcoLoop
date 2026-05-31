@@ -50,6 +50,116 @@ const LinkedinIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const stepsData = [
+  {
+    number: 1,
+    title: "Device Pickup",
+    desc: "Schedule a home pickup or print a pre-paid shipping label.",
+    icon: Truck,
+    color: "from-emerald-500/20 to-emerald-500/5",
+    textColor: "text-emerald-400",
+    glowColor: "rgba(16, 185, 129, 0.2)",
+    iconVariants: { hover: { x: [0, 8, -4, 0], transition: { duration: 0.8, ease: "easeInOut" } } }
+  },
+  {
+    number: 2,
+    title: "AI Evaluation",
+    desc: "AI scans component grades, battery health, and chassis marks.",
+    icon: Cpu,
+    color: "from-cyan-500/20 to-cyan-500/5",
+    textColor: "text-cyan-400",
+    glowColor: "rgba(6, 182, 212, 0.2)",
+    iconVariants: { hover: { rotate: 180, scale: 1.1, transition: { duration: 0.8, ease: "easeInOut" } } }
+  },
+  {
+    number: 3,
+    title: "Route Decision",
+    desc: "Automatic routing to refurbish, resale, parts, or recycling.",
+    icon: Layers,
+    color: "from-blue-500/20 to-blue-500/5",
+    textColor: "text-blue-400",
+    glowColor: "rgba(59, 130, 246, 0.2)",
+    iconVariants: { hover: { y: [0, -6, 6, 0], scale: 1.05, transition: { duration: 0.8, ease: "easeInOut" } } }
+  },
+  {
+    number: 4,
+    title: "Marketplace Listing",
+    desc: "Devices and salvaged parts are listed instantly to B2B/B2C hubs.",
+    icon: ShoppingBag,
+    color: "from-purple-500/20 to-purple-500/5",
+    textColor: "text-purple-400",
+    glowColor: "rgba(168, 85, 247, 0.2)",
+    iconVariants: { hover: { rotate: [0, -15, 15, -10, 10, 0], transition: { duration: 1, ease: "easeInOut" } } }
+  },
+  {
+    number: 5,
+    title: "Reuse & Earn",
+    desc: "Get cash back immediately while keeping rare earth minerals in use.",
+    icon: Coins,
+    color: "from-amber-500/20 to-amber-500/5",
+    textColor: "text-amber-400",
+    glowColor: "rgba(245, 158, 11, 0.2)",
+    iconVariants: { hover: { y: [0, -8, 4, 0], rotate: [0, 10, -10, 0], transition: { duration: 0.9, ease: "easeInOut" } } }
+  }
+];
+
+const featuresData = [
+  {
+    title: "Hybrid Marketplace",
+    desc: "Seamless C2B device collection combined with lightning-fast B2C and bulk B2B component trade systems.",
+    icon: Store,
+    glowColor: "rgba(52, 211, 153, 0.14)", // Emerald
+    iconColor: "text-emerald-400",
+    bgColor: "bg-emerald-400/5 group-hover:bg-emerald-400/10",
+    borderColor: "group-hover:border-emerald-400/30"
+  },
+  {
+    title: "AI Multi-Outcome Engine",
+    desc: "Smart neural networks automatically classify devices into 4 distinct routing outcomes, optimizing value salvage.",
+    icon: BrainCircuit,
+    glowColor: "rgba(59, 130, 246, 0.14)", // Blue
+    iconColor: "text-blue-400",
+    bgColor: "bg-blue-400/5 group-hover:bg-blue-400/10",
+    borderColor: "group-hover:border-blue-400/30"
+  },
+  {
+    title: "Component-Level Recovery",
+    desc: "Surgical harvesting of perfectly intact modules (screens, OEM batteries, cameras) rather than basic crushing.",
+    icon: Wrench,
+    glowColor: "rgba(245, 158, 11, 0.14)", // Amber
+    iconColor: "text-amber-400",
+    bgColor: "bg-amber-400/5 group-hover:bg-amber-400/10",
+    borderColor: "group-hover:border-amber-400/30"
+  },
+  {
+    title: "Dynamic Pricing Models",
+    desc: "Machine learning algorithms track global part scarcity and component demand to guarantee top-dollar payouts instantly.",
+    icon: TrendingUp,
+    glowColor: "rgba(6, 182, 212, 0.14)", // Cyan
+    iconColor: "text-cyan-400",
+    bgColor: "bg-cyan-400/5 group-hover:bg-cyan-400/10",
+    borderColor: "group-hover:border-cyan-400/30"
+  },
+  {
+    title: "Device Journey Tracking",
+    desc: "A secure cryptographic ledger tracks every handoff, certification, and hardware outcome for total circular custody.",
+    icon: Compass,
+    glowColor: "rgba(168, 85, 247, 0.14)", // Purple
+    iconColor: "text-purple-400",
+    bgColor: "bg-purple-400/5 group-hover:bg-purple-400/10",
+    borderColor: "group-hover:border-purple-400/30"
+  },
+  {
+    title: "Eco Transparency",
+    desc: "Get precise reports detailing exactly how much carbon emissions were averted and metals saved with every transaction.",
+    icon: BarChart3,
+    glowColor: "rgba(244, 63, 94, 0.14)", // Rose
+    iconColor: "text-rose-400",
+    bgColor: "bg-rose-400/5 group-hover:bg-rose-400/10",
+    borderColor: "group-hover:border-rose-400/30"
+  }
+];
+
 // ==========================================
 // 1. ANIMATION CONSTANTS & VARIANTS
 // ==========================================
@@ -76,6 +186,203 @@ const staggerContainer = {
 // ==========================================
 // 2. HELPER COMPONENTS
 // ==========================================
+
+interface SpotlightCardProps {
+  children: React.ReactNode;
+  className?: string;
+  glowColor?: string;
+}
+
+function SpotlightCard({ children, className = "", glowColor = "rgba(74, 222, 128, 0.12)" }: SpotlightCardProps) {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setCoords({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  return (
+    <motion.div
+      variants={fadeInUp}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`relative overflow-hidden bg-[#111111]/80 rounded-2xl p-8 border border-white/5 transition-all duration-300 hover:border-white/15 group flex flex-col h-full ${className}`}
+      whileHover={{ y: -6, transition: { duration: 0.2 } }}
+    >
+      {/* Spotlight overlay */}
+      <div
+        className="absolute inset-0 glow-spotlight pointer-events-none transition-opacity duration-500"
+        style={{
+          opacity: isHovered ? 1 : 0,
+          background: `radial-gradient(350px circle at ${coords.x}px ${coords.y}px, ${glowColor}, transparent 80%)`
+        }}
+      />
+
+      {/* Futuristic dotted grid backdrop visible inside spotlight */}
+      <div
+        className="absolute inset-0 tech-grid opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none"
+        style={{
+          maskImage: isHovered ? `radial-gradient(180px circle at ${coords.x}px ${coords.y}px, black 20%, transparent 80%)` : undefined,
+          WebkitMaskImage: isHovered ? `radial-gradient(180px circle at ${coords.x}px ${coords.y}px, black 20%, transparent 80%)` : undefined,
+        }}
+      />
+
+      {/* Decorative radial corner glow */}
+      <div className="absolute -top-12 -left-12 w-24 h-24 bg-gradient-to-br from-white/5 to-transparent rounded-full blur-xl pointer-events-none transition-all duration-300" />
+
+      {/* Content wrapper to ensure relative z-index */}
+      <div className="relative z-10 flex flex-col h-full">
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
+interface HolographicScannerProps {
+  device: "phone" | "laptop" | "tablet";
+  scanStep: number;
+}
+
+function HolographicScanner({ device, scanStep }: HolographicScannerProps) {
+  const isScanning = scanStep > 0 && scanStep < 8;
+  const isFinished = scanStep >= 8;
+
+  const screenGradeColor = !isFinished 
+    ? (scanStep === 4 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600") 
+    : (device === "phone" ? "text-yellow-500" : "text-red-500");
+
+  const batteryGradeColor = !isFinished 
+    ? (scanStep === 5 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600") 
+    : (device === "phone" ? "text-yellow-500" : device === "laptop" ? "text-yellow-500" : "text-red-500");
+
+  const cameraGradeColor = !isFinished 
+    ? (scanStep === 6 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600") 
+    : "text-green-500";
+
+  const chassisGradeColor = !isFinished 
+    ? (scanStep === 7 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600") 
+    : (device === "phone" ? "text-yellow-500" : device === "laptop" ? "text-yellow-500" : "text-red-500");
+
+  return (
+    <div className="relative w-full max-w-[280px] aspect-[4/5] bg-black/40 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center overflow-hidden shadow-2xl">
+      {/* Sci-fi tech border corners */}
+      <span className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-green-500/50" />
+      <span className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-green-500/50" />
+      <span className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-green-500/50" />
+      <span className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-green-500/50" />
+      <span className="absolute top-3 left-6 font-mono text-[9px] text-white/30 uppercase select-none">Appraisal Blueprint v2.0</span>
+
+      {/* Cyber grid texture */}
+      <div className="absolute inset-0 tech-grid opacity-[0.15] pointer-events-none" />
+
+      {/* Sweeping Laser Beam */}
+      {isScanning && (
+        <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent shadow-[0_0_10px_rgba(74,222,128,0.8)] z-20 laser-active pointer-events-none" />
+      )}
+
+      {/* Device Vector Silhouette and target dots */}
+      <div className="relative w-full flex-1 flex items-center justify-center z-10 py-4">
+        {device === "phone" && (
+          <div className="relative w-36 h-64 border-4 border-slate-700/80 rounded-[2.2rem] bg-slate-900/40 p-2 shadow-2xl flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:border-slate-600">
+            {/* Notch */}
+            <div className="w-16 h-4 bg-slate-800 rounded-full mx-auto" />
+            <div className="flex-1 rounded-[1.8rem] border border-slate-800 bg-slate-950/20 relative flex items-center justify-center overflow-hidden mt-1">
+              {/* Screen target */}
+              <div className={`absolute top-[30%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors duration-300 ${screenGradeColor}`} title="Screen check">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">SCR: {isFinished ? "Grade B" : isScanning && scanStep === 4 ? "SCANNING..." : "WAITING"}</span>
+              </div>
+
+              {/* Battery target */}
+              <div className={`absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors duration-300 ${batteryGradeColor}`} title="Battery health">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">BAT: {isFinished ? "82% CAP" : isScanning && scanStep === 5 ? "ANALYZING..." : "WAITING"}</span>
+              </div>
+
+              {/* Camera target */}
+              <div className={`absolute top-[18%] left-[24%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors duration-300 ${cameraGradeColor}`} title="Camera sensor">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">CAM: {isFinished ? "Grade A" : isScanning && scanStep === 6 ? "CHECKING..." : "WAITING"}</span>
+              </div>
+
+              {/* Chassis target */}
+              <div className={`absolute top-[80%] left-[30%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors duration-300 ${chassisGradeColor}`} title="Chassis condition">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">CHA: {isFinished ? "Scuffed" : isScanning && scanStep === 7 ? "INSPECTING..." : "WAITING"}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {device === "laptop" && (
+          <div className="relative w-52 h-44 flex flex-col justify-end transition-all duration-300 hover:scale-[1.02]">
+            {/* Screen lid */}
+            <div className="w-[180px] h-[110px] border-4 border-slate-700/80 rounded-t-xl bg-slate-900/40 mx-auto relative p-1.5 flex items-center justify-center shadow-xl">
+              <div className="flex-1 h-full rounded-t border border-slate-800 bg-slate-950/20 relative">
+                {/* Screen target */}
+                <div className={`absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors duration-300 ${screenGradeColor}`} title="Screen check">
+                  <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                  <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">SCR: {isFinished ? "Grade C" : isScanning && scanStep === 4 ? "SCANNING..." : "WAITING"}</span>
+                </div>
+              </div>
+            </div>
+            {/* Lower deck */}
+            <div className="w-full h-4 border-2 border-slate-700/80 bg-slate-800 rounded-t relative">
+              <div className="w-20 h-1 bg-slate-950 rounded-b mx-auto" />
+              
+              {/* Battery target (inside deck) */}
+              <div className={`absolute top-[-30px] left-[20%] cursor-pointer z-10 transition-colors duration-300 ${batteryGradeColor}`} title="Battery health">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">BAT: {isFinished ? "76% CAP" : isScanning && scanStep === 5 ? "ANALYZING..." : "WAITING"}</span>
+              </div>
+
+              {/* Motherboard target */}
+              <div className={`absolute top-[-30px] right-[20%] cursor-pointer z-10 transition-colors duration-300 ${chassisGradeColor}`} title="Logic board check">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">MB: {isFinished ? "Func 100%" : isScanning && scanStep === 7 ? "INSPECTING..." : "WAITING"}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {device === "tablet" && (
+          <div className="relative w-44 h-56 border-4 border-slate-700/80 rounded-[1.5rem] bg-slate-900/40 p-2 shadow-2xl flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:border-slate-600">
+            <div className="flex-1 rounded-[1.2rem] border border-slate-800 bg-slate-950/20 relative flex items-center justify-center overflow-hidden">
+              {/* Screen target */}
+              <div className={`absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors duration-300 ${screenGradeColor}`} title="Screen check">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">SCR: {isFinished ? "Grade D" : isScanning && scanStep === 4 ? "SCANNING..." : "WAITING"}</span>
+              </div>
+
+              {/* Battery target */}
+              <div className={`absolute top-[75%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors duration-300 ${batteryGradeColor}`} title="Battery health">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">BAT: {isFinished ? "Swollen" : isScanning && scanStep === 5 ? "ANALYZING..." : "WAITING"}</span>
+              </div>
+
+              {/* Motherboard target */}
+              <div className={`absolute top-[18%] left-[25%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors duration-300 ${chassisGradeColor}`} title="Chassis check">
+                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="absolute left-6 -top-1.5 font-mono text-[8px] whitespace-nowrap text-white/50">CHA: {isFinished ? "Bent" : isScanning && scanStep === 7 ? "INSPECTING..." : "WAITING"}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Scan details text */}
+      <div className="w-full mt-2 pt-2 border-t border-white/5 flex justify-between font-mono text-[9px] text-white/40">
+        <span>STATUS: {isFinished ? "LOCKED" : isScanning ? "SCANNING" : "STANDBY"}</span>
+        <span>SYS_TEMP: 34.2°C</span>
+      </div>
+    </div>
+  );
+}
 
 // Smooth scroll counter component
 interface CounterProps {
@@ -471,25 +778,25 @@ export default function Home() {
       {/* ==========================================
           3. HOW IT WORKS
           ========================================== */}
-      <section id="how-it-works" className="relative py-28 bg-[#080808] text-white overflow-hidden">
+      <section id="how-it-works" className="relative py-32 bg-[#080808] text-white overflow-hidden">
         {/* Subtle radial gradient background */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(22,163,74,0.05)_0%,transparent_75%)] opacity-30 z-0" />
-        {/* Dynamic decorative grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0a_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.06)_0%,transparent_75%)] opacity-40 z-0" />
+        {/* Dynamic decorative tech grid overlay */}
+        <div className="absolute inset-0 tech-grid tech-grid-glow pointer-events-none opacity-40 z-0" />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
 
-          <div className="text-center max-w-3xl mx-auto mb-20">
+          <div className="text-center max-w-3xl mx-auto mb-24">
             <FadeUp delay={0.2}>
               <h2 className="font-mono text-xs sm:text-sm font-medium tracking-widest text-green-400 uppercase mb-2">Seamless Lifecycle</h2>
             </FadeUp>
             <FadeUp delay={0.4}>
-              <h3 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-3">
+              <h3 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-3 leading-tight">
                 How the circular loop works.
               </h3>
             </FadeUp>
             <FadeUp delay={0.6}>
-              <p className="mt-4 text-lg text-white/70 leading-relaxed font-body">
+              <p className="mt-5 text-lg text-white/70 leading-relaxed font-body">
                 We turn the linear model of &quot;buy, use, dump&quot; into a self-sustaining cycle in five steps.
               </p>
             </FadeUp>
@@ -498,89 +805,59 @@ export default function Home() {
           {/* Steps Timeline Row */}
           <div className="relative">
 
-            {/* Horizontal Line for Desktop (md and up) */}
-            <div className="hidden md:block absolute top-12 left-12 right-12 h-0.5 bg-slate-700 pointer-events-none z-0">
+            {/* Glowing flowing beam line for desktop (md and up) */}
+            <div className="hidden md:block absolute top-[76px] left-[8%] right-[8%] h-[3px] bg-slate-800/80 pointer-events-none z-0 rounded-full overflow-hidden">
               <motion.div
-                initial={{ width: 0 }}
-                whileInView={{ width: "100%" }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1.5, ease: "easeInOut" }}
-                className="h-full bg-green-500/50"
+                initial={{ left: "-100%" }}
+                animate={{ left: "100%" }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-green-400/80 to-transparent"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-4 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-6 relative z-10">
+              {stepsData.map((step, index) => {
+                const IconComponent = step.icon;
+                return (
+                  <FadeUp key={step.number} delay={0.2 + index * 0.15}>
+                    <motion.div
+                      whileHover="hover"
+                      className="group relative flex flex-col items-center text-center p-6 bg-[#111111]/60 hover:bg-[#161616]/90 border border-white/5 hover:border-white/15 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:shadow-[rgba(74,222,128,0.05)] cursor-pointer"
+                      style={{
+                        boxShadow: `hover: 0 0 30px ${step.glowColor}`
+                      }}
+                      custom={index}
+                    >
+                      {/* Step Number Badge */}
+                      <span className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-slate-900 border border-white/10 text-white font-bold text-xs flex items-center justify-center shadow-lg group-hover:border-green-400/50 transition-colors">
+                        {step.number}
+                      </span>
 
-              {/* Step 1 */}
-              <FadeUp delay={0.7}>
-                <div className="flex flex-col items-center text-center px-4">
-                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
-                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">1</span>
-                    <Truck className="w-9 h-9" />
-                  </div>
-                  <h4 className="font-ui text-lg font-bold text-white mt-6">Device Pickup</h4>
-                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
-                    Schedule a home pickup or print a pre-paid shipping label.
-                  </p>
-                </div>
-              </FadeUp>
+                      {/* Icon with Hover Animation and Radial Glow */}
+                      <div className="relative w-24 h-24 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center relative shadow-lg group-hover:scale-105 group-hover:border-white/20 transition-all duration-300 overflow-hidden">
+                        {/* Interactive dynamic background radial mesh */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-40 group-hover:opacity-100 transition-opacity duration-300`} />
+                        
+                        {/* Icon */}
+                        <motion.div
+                          variants={step.iconVariants}
+                          className={`${step.textColor} relative z-10`}
+                        >
+                          <IconComponent className="w-10 h-10" />
+                        </motion.div>
+                      </div>
 
-              {/* Step 2 */}
-              <FadeUp delay={0.8}>
-                <div className="flex flex-col items-center text-center px-4">
-                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
-                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">2</span>
-                    <Cpu className="w-9 h-9" />
-                  </div>
-                  <h4 className="font-ui text-lg font-bold text-white mt-6">AI Evaluation</h4>
-                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
-                    AI scans component grades, battery health, and chassis marks.
-                  </p>
-                </div>
-              </FadeUp>
-
-              {/* Step 3 */}
-              <FadeUp delay={0.9}>
-                <div className="flex flex-col items-center text-center px-4">
-                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
-                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">3</span>
-                    <Layers className="w-9 h-9" />
-                  </div>
-                  <h4 className="font-ui text-lg font-bold text-white mt-6">Route Decision</h4>
-                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
-                    Automatic routing to refurbish, resale, parts, or recycling.
-                  </p>
-                </div>
-              </FadeUp>
-
-              {/* Step 4 */}
-              <FadeUp delay={1.0}>
-                <div className="flex flex-col items-center text-center px-4">
-                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
-                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">4</span>
-                    <ShoppingBag className="w-9 h-9" />
-                  </div>
-                  <h4 className="font-ui text-lg font-bold text-white mt-6">Marketplace Listing</h4>
-                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
-                    Devices and salvaged parts are listed instantly to B2B/B2C hubs.
-                  </p>
-                </div>
-              </FadeUp>
-
-              {/* Step 5 */}
-              <FadeUp delay={1.1}>
-                <div className="flex flex-col items-center text-center px-4">
-                  <div className="w-20 h-20 rounded-full bg-slate-800 border-2 border-green-500/30 flex items-center justify-center text-green-400 relative shadow-lg">
-                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-600 text-white font-bold text-sm flex items-center justify-center border-2 border-[#080808]">5</span>
-                    <Coins className="w-9 h-9" />
-                  </div>
-                  <h4 className="font-ui text-lg font-bold text-white mt-6">Reuse & Earn</h4>
-                  <p className="font-body text-sm text-white/70 mt-2 leading-relaxed max-w-[200px]">
-                    Get cash back immediately while keeping rare earth minerals in use.
-                  </p>
-                </div>
-              </FadeUp>
-
+                      {/* Step Info */}
+                      <h4 className="font-ui text-lg font-bold text-white mt-6 group-hover:text-green-400 transition-colors">
+                        {step.title}
+                      </h4>
+                      <p className="font-body text-sm text-white/60 mt-3 leading-relaxed">
+                        {step.desc}
+                      </p>
+                    </motion.div>
+                  </FadeUp>
+                );
+              })}
             </div>
           </div>
 
@@ -590,12 +867,13 @@ export default function Home() {
       {/* ==========================================
           4. CORE FEATURES
           ========================================== */}
-      <section id="features" className="relative py-28 bg-[#080808] text-white">
+      <section id="features" className="relative py-32 bg-[#080808] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,222,128,0.03)_0%,transparent_70%)] opacity-35 z-0" />
         <div className="max-w-7xl mx-auto px-6 relative z-10">
 
-          <div className="text-center max-w-3xl mx-auto mb-20">
+          <div className="text-center max-w-3xl mx-auto mb-24">
             <FadeUp>
-              <h2 className="font-mono text-sm tracking-widest text-green-400 uppercase">Circular Architecture</h2>
+              <h2 className="font-mono text-xs sm:text-sm font-medium tracking-widest text-green-400 uppercase">Circular Architecture</h2>
             </FadeUp>
             <FadeUp delay={0.2}>
               <h3 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white mt-3">
@@ -603,7 +881,7 @@ export default function Home() {
               </h3>
             </FadeUp>
             <FadeUp delay={0.4}>
-              <p className="mt-4 text-lg text-white/70 leading-relaxed font-body">
+              <p className="mt-5 text-lg text-white/70 leading-relaxed font-body">
                 Our proprietary suite of technologies simplifies complex circular electronics pipelines.
               </p>
             </FadeUp>
@@ -613,98 +891,45 @@ export default function Home() {
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.15 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
-            {/* Feature 1 */}
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(74, 222, 128, 0.2)" }}
-              className="bg-[#161616] rounded-2xl p-8 border border-white/10 transition-colors duration-300 group flex flex-col h-full"
-            >
-              <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
-                <Store className="w-6 h-6" />
-              </div>
-              <h4 className="font-ui text-xl font-bold text-white">Hybrid Marketplace</h4>
-              <p className="font-body text-sm text-white/60 mt-3 leading-relaxed flex-grow">
-                Seamless C2B device collection combined with lightning-fast B2C and bulk B2B component trade systems.
-              </p>
-            </motion.div>
+            {featuresData.map((feature, i) => {
+              const IconComponent = feature.icon;
+              return (
+                <SpotlightCard
+                  key={feature.title}
+                  glowColor={feature.glowColor}
+                >
+                  {/* Styled Icon Pod */}
+                  <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center relative shadow-lg group-hover:scale-105 group-hover:border-white/20 transition-all duration-300 mb-6 overflow-hidden">
+                    <div className={`absolute inset-0 ${feature.bgColor} transition-colors duration-300`} />
+                    <motion.div
+                      animate={{
+                        y: [0, -4, 0],
+                        transition: {
+                          duration: 4,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.4
+                        }
+                      }}
+                      className={`${feature.iconColor} relative z-10`}
+                    >
+                      <IconComponent className="w-6 h-6" />
+                    </motion.div>
+                  </div>
 
-            {/* Feature 2 */}
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(74, 222, 128, 0.2)" }}
-              className="bg-[#161616] rounded-2xl p-8 border border-white/10 transition-colors duration-300 group flex flex-col h-full"
-            >
-              <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
-                <BrainCircuit className="w-6 h-6" />
-              </div>
-              <h4 className="font-ui text-xl font-bold text-white">AI Multi-Outcome Engine</h4>
-              <p className="font-body text-sm text-white/60 mt-3 leading-relaxed flex-grow">
-                Smart neural networks automatically classify devices into 4 distinct routing outcomes, optimizing value salvage.
-              </p>
-            </motion.div>
-
-            {/* Feature 3 */}
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(74, 222, 128, 0.2)" }}
-              className="bg-[#161616] rounded-2xl p-8 border border-white/10 transition-colors duration-300 group flex flex-col h-full"
-            >
-              <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
-                <Wrench className="w-6 h-6" />
-              </div>
-              <h4 className="font-ui text-xl font-bold text-white">Component-Level Recovery</h4>
-              <p className="font-body text-sm text-white/60 mt-3 leading-relaxed flex-grow">
-                Surgical harvesting of perfectly intact modules (screens, OEM batteries, cameras) rather than basic crushing.
-              </p>
-            </motion.div>
-
-            {/* Feature 4 */}
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(74, 222, 128, 0.2)" }}
-              className="bg-[#161616] rounded-2xl p-8 border border-white/10 transition-colors duration-300 group flex flex-col h-full"
-            >
-              <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
-                <TrendingUp className="w-6 h-6" />
-              </div>
-              <h4 className="font-ui text-xl font-bold text-white">Dynamic Pricing Models</h4>
-              <p className="font-body text-sm text-white/60 mt-3 leading-relaxed flex-grow">
-                Machine learning algorithms track global part scarcity and component demand to guarantee top-dollar payouts instantly.
-              </p>
-            </motion.div>
-
-            {/* Feature 5 */}
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(74, 222, 128, 0.2)" }}
-              className="bg-[#161616] rounded-2xl p-8 border border-white/10 transition-colors duration-300 group flex flex-col h-full"
-            >
-              <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
-                <Compass className="w-6 h-6" />
-              </div>
-              <h4 className="font-ui text-xl font-bold text-white">Device Journey Tracking</h4>
-              <p className="font-body text-sm text-white/60 mt-3 leading-relaxed flex-grow">
-                A secure cryptographic ledger tracks every handoff, certification, and hardware outcome for total circular custody.
-              </p>
-            </motion.div>
-
-            {/* Feature 6 */}
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ scale: 1.05, boxShadow: "0px 0px 30px rgba(74, 222, 128, 0.2)" }}
-              className="bg-[#161616] rounded-2xl p-8 border border-white/10 transition-colors duration-300 group flex flex-col h-full"
-            >
-              <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
-                <BarChart3 className="w-6 h-6" />
-              </div>
-              <h4 className="font-ui text-xl font-bold text-white">Eco Transparency</h4>
-              <p className="font-body text-sm text-white/60 mt-3 leading-relaxed flex-grow">
-                Get precise reports detailing exactly how much carbon emissions were averted and metals saved with every transaction.
-              </p>
-            </motion.div>
+                  {/* Feature Title & Text */}
+                  <h4 className="font-ui text-xl font-bold text-white group-hover:text-green-400 transition-colors duration-300">
+                    {feature.title}
+                  </h4>
+                  <p className="font-body text-sm text-white/60 mt-3.5 leading-relaxed flex-grow">
+                    {feature.desc}
+                  </p>
+                </SpotlightCard>
+              );
+            })}
           </motion.div>
 
         </div>
@@ -713,39 +938,42 @@ export default function Home() {
       {/* ==========================================
           5. AI DECISION ENGINE SHOWCASE
           ========================================== */}
-      <section id="showcase" ref={showcaseRef} className="relative py-28 bg-[#0f0f0f] text-white overflow-hidden">
+      <section id="showcase" ref={showcaseRef} className="relative py-32 bg-[#0f0f0f] text-white overflow-hidden">
 
         {/* Decorative Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#3341551a_1px,transparent_1px),linear-gradient(to_bottom,#3341551a_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#3341550c_1px,transparent_1px),linear-gradient(to_bottom,#3341550c_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+        <div className="absolute inset-0 tech-grid opacity-25 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
             {/* Left Column: Context & Interactive Controls */}
-            <div>
-              <FadeUp>
-                <span className="font-mono text-sm tracking-widest text-green-400 uppercase">
-                  Live AI Classifier
-                </span>
-              </FadeUp>
-              <FadeUp delay={0.2}>
-                <h3 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white mt-3">
-                  Watch the AI engine decide outcome priorities.
-                </h3>
-              </FadeUp>
-              <FadeUp delay={0.4}>
-                <p className="mt-4 text-lg text-white/70 leading-relaxed font-body">
-                  Choose a sample device below to trigger our scanning neural pipeline. The diagnostic array inspects component qualities and locks the most sustainable, high-value outcome.
-                </p>
-              </FadeUp>
+            <div className="lg:col-span-4 flex flex-col gap-6">
+              <div>
+                <FadeUp>
+                  <span className="font-mono text-sm tracking-widest text-green-400 uppercase">
+                    Live AI Classifier
+                  </span>
+                </FadeUp>
+                <FadeUp delay={0.2}>
+                  <h3 className="font-display text-4xl sm:text-5xl lg:text-4xl xl:text-5xl font-bold tracking-tight text-white mt-3 leading-tight">
+                    Watch the AI engine decide outcome priorities.
+                  </h3>
+                </FadeUp>
+                <FadeUp delay={0.4}>
+                  <p className="mt-4 text-base text-white/70 leading-relaxed font-body">
+                    Choose a sample device below to trigger our scanning neural pipeline. The diagnostic array inspects component qualities and locks the most sustainable, high-value outcome.
+                  </p>
+                </FadeUp>
+              </div>
 
               {/* Selector Tabs */}
-              <FadeUp delay={0.6}>
-                <div className="mt-8 p-1.5 bg-[#161616] border border-white/10 rounded-xl flex gap-1 font-ui">
+              <FadeUp delay={0.5}>
+                <div className="p-1.5 bg-[#161616] border border-white/10 rounded-xl flex gap-1 font-ui">
                   <button
                     onClick={() => setSelectedDevice("phone")}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${selectedDevice === "phone"
+                    className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-200 ${selectedDevice === "phone"
                       ? "bg-green-400 text-black shadow"
                       : "text-white/60 hover:text-white hover:bg-white/10"
                       }`}
@@ -754,7 +982,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSelectedDevice("laptop")}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${selectedDevice === "laptop"
+                    className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-200 ${selectedDevice === "laptop"
                       ? "bg-green-400 text-black shadow"
                       : "text-white/60 hover:text-white hover:bg-white/10"
                       }`}
@@ -763,7 +991,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSelectedDevice("tablet")}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${selectedDevice === "tablet"
+                    className={`flex-1 py-2.5 px-3 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-200 ${selectedDevice === "tablet"
                       ? "bg-green-400 text-black shadow"
                       : "text-white/60 hover:text-white hover:bg-white/10"
                       }`}
@@ -774,8 +1002,8 @@ export default function Home() {
               </FadeUp>
 
               {/* Active Pipeline Status List */}
-              <FadeUp delay={0.8}>
-                <div className="mt-8 space-y-4 font-body">
+              <FadeUp delay={0.6}>
+                <div className="space-y-4 font-body border-t border-white/5 pt-4 mt-2">
                   <div className="flex items-center gap-3">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${scanStep >= 2 ? 'bg-green-400/20 text-green-400' : 'bg-white/10 text-white/60 animate-pulse'}`}>
                       {scanStep >= 2 ? <CheckCircle2 className="w-4 h-4 text-green-400" /> : "1"}
@@ -783,152 +1011,162 @@ export default function Home() {
                     <span className={`text-sm ${scanStep >= 2 ? 'text-white font-semibold' : 'text-white/60'}`}>Optical Scanner Assessment</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${scanStep >= 4 ? 'bg-green-400/20 text-green-400' : 'bg-white/10 text-white/60'}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${scanStep >= 4 ? 'bg-green-400/20 text-green-400' : 'bg-white/10 text-white/60 animate-pulse'}`}>
                       {scanStep >= 4 ? <CheckCircle2 className="w-4 h-4 text-green-400" /> : "2"}
                     </div>
-                    <span className={`text-sm ${scanStep >= 4 ? 'text-white font-semibold' : 'text-white/60'}`}>State-of-Health Diagnostic Checks</span>
+                    <span className={`text-sm ${scanStep >= 4 ? 'text-white font-semibold' : 'text-white/60'}`}>State-of-Health Checks</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${scanStep >= 7 ? 'bg-green-400/20 text-green-400' : 'bg-white/10 text-white/60'}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${scanStep >= 7 ? 'bg-green-400/20 text-green-400' : 'bg-white/10 text-white/60 animate-pulse'}`}>
                       {scanStep >= 7 ? <CheckCircle2 className="w-4 h-4 text-green-400" /> : "3"}
                     </div>
-                    <span className={`text-sm ${scanStep >= 7 ? 'text-white font-semibold' : 'text-white/60'}`}>Outcome Routing Decisions Locked</span>
+                    <span className={`text-sm ${scanStep >= 7 ? 'text-white font-semibold' : 'text-white/60'}`}>Routing Outcome Locked</span>
                   </div>
                 </div>
               </FadeUp>
             </div>
 
+            {/* Middle Column: Holographic SVG Blueprint Scanner */}
+            <div className="lg:col-span-4 flex items-center justify-center my-6 lg:my-0">
+              <FadeUp delay={0.4}>
+                <HolographicScanner device={selectedDevice} scanStep={scanStep} />
+              </FadeUp>
+            </div>
+
             {/* Right Column: Code Output & Decision Graph Mockup */}
-            <FadeUp delay={0.5}>
-              <div className="relative">
+            <div className="lg:col-span-4">
+              <FadeUp delay={0.5}>
+                <div className="relative">
 
-                {/* Behind card subtle ambient glow */}
-                <div className="absolute -inset-2 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-30 pointer-events-none" />
+                  {/* Behind card subtle ambient glow */}
+                  <div className="absolute -inset-2 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-30 pointer-events-none" />
 
-                <div className="relative bg-[#161616] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="relative bg-[#111111]/90 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
 
-                  {/* Window header */}
-                  <div className="bg-black/20 px-6 py-3 border-b border-white/10 flex items-center justify-between">
-                    <div className="flex gap-2">
-                      <span className="w-3 h-3 rounded-full bg-red-500" />
-                      <span className="w-3 h-3 rounded-full bg-yellow-500" />
-                      <span className="w-3 h-3 rounded-full bg-green-500" />
-                    </div>
-                    <span className="text-xs font-semibold text-white/50 font-mono select-none">ecoloop-ai-scan.json</span>
-                    <div className="w-12" /> {/* empty spacer */}
-                  </div>
-
-                  {/* Console contents split layout */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 min-h-[350px]">
-
-                    {/* Left panel: Typewriter Logs */}
-                    <div className="font-mono text-xs text-green-400 space-y-2 border-r border-white/10 pr-4 overflow-y-auto no-scrollbar max-h-[300px]">
-                      <div className="text-white/50 border-b border-white/10 pb-2 mb-2">SYSTEM CONSOLE LOGS</div>
-                      {typedLogs.map((log, i) => (
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.3 }}
-                          key={i}
-                          className={`leading-relaxed ${i === typedLogs.length - 1 ? 'font-bold text-white' : ''}`}
-                        >
-                          <span className="text-white/40 select-none">&gt;&nbsp;</span>
-                          {log}
-                        </motion.div>
-                      ))}
-                      {scanStep < 8 && (
-                        <span className="inline-block w-1.5 h-4 bg-green-400 animate-pulse" />
-                      )}
+                    {/* Window header */}
+                    <div className="bg-black/20 px-6 py-3 border-b border-white/10 flex items-center justify-between">
+                      <div className="flex gap-2">
+                        <span className="w-3 h-3 rounded-full bg-red-500" />
+                        <span className="w-3 h-3 rounded-full bg-yellow-500" />
+                        <span className="w-3 h-3 rounded-full bg-green-500" />
+                      </div>
+                      <span className="text-xs font-semibold text-white/50 font-mono select-none">ecoloop-ai-scan.json</span>
+                      <div className="w-12" /> {/* empty spacer */}
                     </div>
 
-                    {/* Right panel: Graph Breakdowns & Decision Badge */}
-                    <div className="flex flex-col justify-between pt-2 md:pt-0 pl-0 md:pl-2">
+                    {/* Console contents split layout */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 min-h-[350px]">
 
-                      {/* Badge */}
-                      <div className="mb-4">
-                        <div className="font-mono text-xs font-semibold text-white/50 mb-1">CLASSIFICATION STATUS</div>
-                        {scanStep >= 8 ? (
+                      {/* Left panel: Typewriter Logs */}
+                      <div className="font-mono text-[10px] text-green-400 space-y-2 border-r border-white/10 pr-3 overflow-y-auto no-scrollbar max-h-[300px]">
+                        <div className="text-white/40 border-b border-white/10 pb-1 mb-2 font-bold select-none">SYSTEM CONSOLE</div>
+                        {typedLogs.map((log, i) => (
                           <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-green-400/10 border border-green-400/30 px-3 py-1.5 text-sm font-bold text-green-400"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3 }}
+                            key={i}
+                            className={`leading-relaxed ${i === typedLogs.length - 1 ? 'font-bold text-white glow-green' : ''}`}
                           >
-                            <ShieldCheck className="w-4 h-4" />
-                            {deviceSpecs[selectedDevice].outcome}
+                            <span className="text-white/30 select-none">&gt;&nbsp;</span>
+                            {log}
                           </motion.div>
-                        ) : (
-                          <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 border border-white/20 px-3 py-1.5 text-sm font-bold text-white/60 animate-pulse">
-                            Analyzing...
-                          </div>
+                        ))}
+                        {scanStep < 8 && (
+                          <span className="inline-block w-1.5 h-3.5 bg-green-400 animate-pulse" />
                         )}
                       </div>
 
-                      {/* Progress Bars */}
-                      <div className="space-y-4">
-                        <div className="font-mono text-xs font-semibold text-white/50 border-b border-white/10 pb-1">OUTCOME PROBABILITIES</div>
+                      {/* Right panel: Graph Breakdowns & Decision Badge */}
+                      <div className="flex flex-col justify-between pt-2 md:pt-0 pl-0 md:pl-2">
 
-                        {/* Refurbish Bar */}
-                        <div>
-                          <div className="flex justify-between text-[11px] font-semibold text-white/80 mb-1 font-body">
-                            <span>Refurbish & Sell</span>
-                            <span>{scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.refurbish}%` : '0%'}</span>
-                          </div>
-                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        {/* Badge */}
+                        <div className="mb-4">
+                          <div className="font-mono text-[9px] font-semibold text-white/40 mb-1 select-none">CLASSIFICATION</div>
+                          {scanStep >= 8 ? (
                             <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.refurbish}%` : 0 }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className="h-full bg-green-400"
-                            />
-                          </div>
+                              initial={{ scale: 0.9, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-green-400/10 border border-green-400/30 px-2.5 py-1 text-xs font-bold text-green-400 shadow-[0_0_15px_rgba(74,222,128,0.1)]"
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5" />
+                              {deviceSpecs[selectedDevice].outcome}
+                            </motion.div>
+                          ) : (
+                            <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-2.5 py-1 text-xs font-bold text-white/50 animate-pulse">
+                              Analyzing...
+                            </div>
+                          )}
                         </div>
 
-                        {/* Peer Resale Bar */}
-                        <div>
-                          <div className="flex justify-between text-[11px] font-semibold text-white/80 mb-1 font-body">
-                            <span>Peer-to-Peer Resale</span>
-                            <span>{scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.resale}%` : '0%'}</span>
-                          </div>
-                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.resale}%` : 0 }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className="h-full bg-blue-400"
-                            />
-                          </div>
-                        </div>
+                        {/* Progress Bars */}
+                        <div className="space-y-4 font-ui">
+                          <div className="font-mono text-[9px] font-semibold text-white/40 border-b border-white/10 pb-1 select-none">PROBABILITIES</div>
 
-                        {/* Parts Salvage Bar */}
-                        <div>
-                          <div className="flex justify-between text-[11px] font-semibold text-white/80 mb-1 font-body">
-                            <span>Component Harvesting</span>
-                            <span>{scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.salvage}%` : '0%'}</span>
+                          {/* Refurbish Bar */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-semibold text-white/80 mb-1 font-body">
+                              <span>Refurbish & Sell</span>
+                              <span>{scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.refurbish}%` : '0%'}</span>
+                            </div>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.refurbish}%` : 0 }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="h-full bg-gradient-to-r from-green-500 to-green-400"
+                              />
+                            </div>
                           </div>
-                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.salvage}%` : 0 }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className="h-full bg-yellow-400"
-                            />
-                          </div>
-                        </div>
 
-                        {/* Recycle Bar */}
-                        <div>
-                          <div className="flex justify-between text-[11px] font-semibold text-white/80 mb-1 font-body">
-                            <span>Green Scrap Recycling</span>
-                            <span>{scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.recycle}%` : '0%'}</span>
+                          {/* Peer Resale Bar */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-semibold text-white/80 mb-1 font-body">
+                              <span>P2P Resale</span>
+                              <span>{scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.resale}%` : '0%'}</span>
+                            </div>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.resale}%` : 0 }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="h-full bg-gradient-to-r from-blue-500 to-blue-400"
+                              />
+                            </div>
                           </div>
-                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.recycle}%` : 0 }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className="h-full bg-red-400"
-                            />
+
+                          {/* Parts Salvage Bar */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-semibold text-white/80 mb-1 font-body">
+                              <span>Parts Harvest</span>
+                              <span>{scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.salvage}%` : '0%'}</span>
+                            </div>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.salvage}%` : 0 }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="h-full bg-gradient-to-r from-yellow-500 to-yellow-400"
+                              />
+                            </div>
                           </div>
+
+                          {/* Recycle Bar */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-semibold text-white/80 mb-1 font-body">
+                              <span>Raw Recycling</span>
+                              <span>{scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.recycle}%` : '0%'}</span>
+                            </div>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: scanStep >= 8 ? `${deviceSpecs[selectedDevice].confidences.recycle}%` : 0 }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="h-full bg-gradient-to-r from-red-500 to-red-400"
+                              />
+                            </div>
+                          </div>
+
                         </div>
 
                       </div>
@@ -938,9 +1176,9 @@ export default function Home() {
                   </div>
 
                 </div>
+              </FadeUp>
+            </div>
 
-              </div>
-            </FadeUp>
           </div>
 
         </div>

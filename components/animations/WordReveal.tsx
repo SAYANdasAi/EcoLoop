@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
 import { cn } from "../../lib/utils";
 
-export function WordReveal({ text, className, greenWords=[] }) {
+interface WordRevealProps {
+  text: string;
+  className?: string;
+  greenWords?: string[];
+}
+
+export function WordReveal({ text, className, greenWords=[] }: WordRevealProps) {
   return (
     <motion.h1 className={cn("font-display",className)} initial="hidden" whileInView="visible" viewport={{once:true}} variants={{visible:{transition:{staggerChildren:0.07}}}}>
       {text.split(" ").map((word,i) => (
@@ -10,3 +16,4 @@ export function WordReveal({ text, className, greenWords=[] }) {
     </motion.h1>
   )
 }
+
