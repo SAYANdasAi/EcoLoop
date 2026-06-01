@@ -1,0 +1,40 @@
+.backgroundMarquee {
+  position: absolute;
+  top: 180px;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.09; // Ghostly green display text
+  white-space: nowrap;
+  user-select: none;
+}
+
+.marqueeTrack {
+  display: flex;
+  animation: scrollLeft 45s linear infinite;
+  white-space: nowrap;
+  width: max-content;
+}
+
+.milkerText {
+  font-family: var(--font-display), sans-serif;
+  font-size: 15vw; // Massive, blocky display font size
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 3px #00ea64; // Sharp ghostly green outline
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-right: 80px;
+  display: inline-block;
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

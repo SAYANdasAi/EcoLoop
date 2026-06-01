@@ -1,0 +1,203 @@
+.mainContainer {
+  position: relative;
+  width: 100%;
+  background-color: transparent;
+}
+
+.stickyDeck {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  // When any card inner wrapper is hovered, dim and blur all sibling card containers
+  &:has(.cardInnerWrapper:hover) {
+    .cardContainer {
+      opacity: 0.35;
+      filter: blur(1.5px) grayscale(20%);
+    }
+  }
+}
+
+.cardContainer {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.3, 1), 
+              filter 0.5s cubic-bezier(0.25, 1, 0.3, 1);
+
+  // When this container's specific inner wrapper is hovered, bring it to the absolute front and highlight it
+  &:has(.cardInnerWrapper:hover) {
+    z-index: 1000 !important;
+    opacity: 1 !important;
+    filter: blur(0px) grayscale(0%) !important;
+  }
+}
+
+.cardInnerWrapper {
+  position: relative;
+  width: 90%;
+  max-width: 1000px;
+  height: 480px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-origin: center center;
+  perspective: 1000px; /* Enable beautiful 3D tilt hover! */
+  transform-style: preserve-3d;
+  pointer-events: auto;
+
+  &:hover {
+    .cardInner {
+      // translateY(-40px) moves the card radially outwards along its tangent axis
+      // scale(1.75) reverses the circular parent scale (0.52) back to full legibility (~0.91)
+      transform: translateY(-40px) scale(1.75) !important;
+      box-shadow: 0 45px 90px rgba(0, 234, 100, 0.22), 0 0 0 2px rgba(0, 234, 100, 0.35);
+      border-color: rgba(0, 234, 100, 0.55);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    &:hover {
+      .cardInner {
+        transform: translateY(-30px) scale(1.95) !important; // Balances parent scale (0.45) on tablet
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 95%;
+    height: auto;
+    max-height: 85vh;
+
+    &:hover {
+      .cardInner {
+        transform: translateY(-20px) scale(2.2) !important; // Balances parent scale (0.38) on mobile
+      }
+    }
+  }
+}
+
+.cardInner {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.12); /* Slightly brighter glass border */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  padding: 48px;
+  gap: 32px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.3, 1),
+              box-shadow 0.5s cubic-bezier(0.25, 1, 0.3, 1),
+              border-color 0.5s cubic-bezier(0.25, 1, 0.3, 1);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: auto;
+    padding: 32px;
+    gap: 24px;
+  }
+}
+
+.leftColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  z-index: 10;
+
+  @media (max-width: 768px) {
+    gap: 16px;
+  }
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardTitle {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.cardDesc {
+  font-family: var(--font-body), sans-serif;
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  max-width: 480px;
+}
+
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-ui), sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  width: fit-content;
+  border-bottom: 1.5px solid transparent;
+  padding-bottom: 2px;
+  transition: border-color 0.25s, gap 0.25s;
+
+  svg {
+    transition: transform 0.25s;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.8);
+    gap: 12px;
+    svg {
+      transform: translateX(4px);
+    }
+  }
+}
+
+.rightColumn {
+  position: relative;
+  width: 32%;
+  height: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 200px;
+    flex-shrink: 0;
+  }
+}
+
+.imageOuterWrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.imageInner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}

@@ -28,6 +28,10 @@ import { WordReveal } from "../components/animations/WordReveal";
 import { GlowText } from "../components/animations/GlowText";
 import { FadeUp } from "../components/animations/FadeUp";
 import { FloatCard } from "../components/animations/FloatCard";
+import SideMenu from "../components/SideMenu";
+import StickyCards from "../components/StickyCards";
+import Marquee from "../components/Marquee";
+import InteractiveGridBg from "../components/InteractiveGridBg";
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -593,15 +597,15 @@ export default function Home() {
   }, [isShowcaseInView, selectedDevice]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-green-500 selection:text-slate-950 overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-slate-100 font-sans selection:bg-green-500 selection:text-slate-950 overflow-x-hidden relative">
+      <InteractiveGridBg />
+      <SideMenu />
+      <Marquee />
 
       {/* ==========================================
           1. NAVBAR
           ========================================== */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-        ? "border-b border-slate-800 bg-[#0F172A]/85 backdrop-blur-md py-4 shadow-lg shadow-black/20"
-        : "border-b border-transparent bg-transparent py-6"
-        }`}>
+      <nav className="absolute top-0 left-0 right-0 z-40 bg-transparent py-6 border-b border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group">
@@ -673,12 +677,30 @@ export default function Home() {
         <div className="absolute inset-0 bg-grid-white/[0.05] z-0" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#080808] z-10" />
         <div className="relative z-20 flex flex-col items-center text-center px-6">
-          <WordReveal
-            className="text-5xl md:text-7xl font-bold"
-            text="Turn Your E-Waste Into Opportunity"
-            greenWords={["E-Waste"]}
-          />
-
+          <FadeUp>
+            <h1 className="text-center font-bold tracking-tighter" style={{ fontFamily: 'var(--font-sans), Inter, system-ui, sans-serif', fontSize: 'clamp(48px, 7vw, 88px)', lineHeight: 1.05, letterSpacing: '-0.03em' }}>
+              <span style={{ color: 'rgba(255, 255, 255, 0.22)', display: 'block' }}>The future of</span>
+              <span style={{ color: 'rgba(255, 255, 255, 0.22)', display: 'block' }}>circular electronics</span>
+              <span style={{ color: 'rgba(255, 255, 255, 0.88)', display: 'block' }}>
+                is 
+                <svg width="0.75em" height="0.75em" viewBox="0 0 32 32" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.15em', marginLeft: '0.15em' }}>
+                  <path d="M16 2A14 14 0 0 0 2 16a1 1 0 0 0 2 0 12 12 0 1 1 24 0 1 1 0 0 0 2 0A14 14 0 0 0 16 2zm0 4a10 10 0 0 0-10 10 1 1 0 0 0 2 0 8 8 0 1 1 16 0 1 1 0 0 0 2 0 10 10 0 0 0-10-10zm0 4a6 6 0 0 0-6 6 1 1 0 0 0 2 0 4 4 0 1 1 8 0 1 1 0 0 0 2 0 6 6 0 0 0-6-6zm0 4a2 2 0 0 0-2 2v2a1 1 0 0 0 2 0v-2a2 2 0 0 0 0-4z" fill="#00ea64" />
+                </svg>
+                human + 
+                <svg width="0.75em" height="0.75em" viewBox="0 0 32 32" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.15em', marginLeft: '0.15em' }}>
+                  <defs>
+                    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#00ea64" />
+                      <stop offset="100%" stopColor="#00fae6" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M16 2C16 11 21 16 30 16C21 16 16 21 16 30C16 21 11 16 2 16C11 16 16 11 16 2Z" fill="url(#starGradient)" />
+                </svg>
+                AI
+              </span>
+            </h1>
+          </FadeUp>
+ 
           <FadeUp delay={0.8}>
             <p className="mt-6 text-lg md:text-xl text-white/55 max-w-3xl font-body">
               EcoLoop uses AI to determine the best second life for your used
@@ -686,188 +708,146 @@ export default function Home() {
               circular economy.
             </p>
           </FadeUp>
-
+ 
           <FadeUp delay={1.0}>
-            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/submit"
-                className="bg-green-400 text-black font-ui font-bold text-lg px-8 py-4 rounded-xl shadow-[0_0_40px_rgba(74,222,128,0.4)]"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  borderRadius: '8px',
+                  padding: '14px 40px',
+                  marginTop: '10px',
+                  boxShadow: '0 6px 28px rgba(0, 234, 100, 0.18)',
+                  transition: 'all 0.25s ease',
+                  display: 'inline-block',
+                  cursor: 'pointer'
+                }}
+                className="hover-cta-glow font-ui"
               >
                 Start AI Appraisal
               </Link>
-              <Link
-                href="#process"
-                className="border border-white/10 font-ui font-medium px-8 py-4 rounded-xl"
-              >
-                Learn More <ArrowRight className="inline -mt-1" size={16} />
-              </Link>
+            </div>
+          </FadeUp>
+          <FadeUp delay={1.2}>
+            <div className="mt-16 w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pointer-events-auto">
+              <FloatCard amplitude={6} duration={4} rotate={2} delay={0.1}>
+                <div className="bg-[#0f0f0f]/90 border border-white/10 rounded-2xl p-5 flex items-center space-x-4 shadow-xl hover:border-green-400/30 transition-all duration-300">
+                  <Recycle size={32} className="text-green-400 flex-shrink-0" />
+                  <div className="text-left">
+                    <h4 className="font-ui font-bold text-sm text-white">Recycle</h4>
+                    <p className="text-[11px] text-white/50 font-mono mt-1">Safely extract raw minerals.</p>
+                  </div>
+                </div>
+              </FloatCard>
+              
+              <FloatCard amplitude={8} duration={5} rotate={-1} delay={0.2}>
+                <div className="bg-[#0f0f0f]/90 border border-white/10 rounded-2xl p-5 flex items-center space-x-4 shadow-xl hover:border-blue-400/30 transition-all duration-300">
+                  <Wrench size={32} className="text-blue-400 flex-shrink-0" />
+                  <div className="text-left">
+                    <h4 className="font-ui font-bold text-sm text-white">Refurbish</h4>
+                    <p className="text-[11px] text-white/50 font-mono mt-1">Restore and calibrate to mint.</p>
+                  </div>
+                </div>
+              </FloatCard>
+              
+              <FloatCard amplitude={5} duration={4.5} rotate={2} delay={0.3}>
+                <div className="bg-[#0f0f0f]/90 border border-white/10 rounded-2xl p-5 flex items-center space-x-4 shadow-xl hover:border-yellow-400/30 transition-all duration-300">
+                  <Package size={32} className="text-yellow-400 flex-shrink-0" />
+                  <div className="text-left">
+                    <h4 className="font-ui font-bold text-sm text-white">Parts Harvest</h4>
+                    <p className="text-[11px] text-white/50 font-mono mt-1">Salvage components for B2B.</p>
+                  </div>
+                </div>
+              </FloatCard>
+              
+              <FloatCard amplitude={7} duration={6} rotate={-2} delay={0.4}>
+                <div className="bg-[#0f0f0f]/90 border border-white/10 rounded-2xl p-5 flex items-center space-x-4 shadow-xl hover:border-purple-400/30 transition-all duration-300">
+                  <ShoppingCart size={32} className="text-purple-400 flex-shrink-0" />
+                  <div className="text-left">
+                    <h4 className="font-ui font-bold text-sm text-white">Resell</h4>
+                    <p className="text-[11px] text-white/50 font-mono mt-1">List on marketplace hubs.</p>
+                  </div>
+                </div>
+              </FloatCard>
             </div>
           </FadeUp>
         </div>
-
-        <div className="absolute bottom-0 left-0 right-0 h-96 z-20 pointer-events-none">
-          <div className="relative w-full h-full">
-            <FloatCard
-              amplitude={10}
-              duration={4}
-              rotate={3}
-              delay={0.5}
-            >
-              <div className="absolute bottom-20 left-[10%] w-48 h-24 bg-[#0f0f0f] border border-white/10 rounded-2xl p-4 flex items-center space-x-3">
-                <Recycle size={32} className="text-green-400" />
-                <div>
-                  <h4 className="font-ui font-bold">Recycle</h4>
-                  <p className="text-xs text-white/50 font-mono">
-                    Safely extract raw materials.
-                  </p>
-                </div>
-              </div>
-            </FloatCard>
-            <FloatCard
-              amplitude={15}
-              duration={5}
-              rotate={-2}
-              delay={1.0}
-            >
-              <div className="absolute bottom-40 left-[25%] w-52 h-24 bg-[#0f0f0f] border border-white/10 rounded-2xl p-4 flex items-center space-x-3">
-                <Wrench size={32} className="text-blue-400" />
-                <div>
-                  <h4 className="font-ui font-bold">Refurbish</h4>
-                  <p className="text-xs text-white/50 font-mono">
-                    Repair and restore to mint condition.
-                  </p>
-                </div>
-              </div>
-            </FloatCard>
-            <FloatCard
-              amplitude={12}
-              duration={4.5}
-              rotate={4}
-              delay={0.2}
-            >
-              <div className="absolute bottom-32 right-[22%] w-56 h-24 bg-[#0f0f0f] border border-white/10 rounded-2xl p-4 flex items-center space-x-3">
-                <Package size={32} className="text-yellow-400" />
-                <div>
-                  <h4 className="font-ui font-bold">Parts Harvest</h4>
-                  <p className="text-xs text-white/50 font-mono">
-                    Salvage working components for resale.
-                  </p>
-                </div>
-              </div>
-            </FloatCard>
-            <FloatCard
-              amplitude={18}
-              duration={6}
-              rotate={-3}
-              delay={0.8}
-            >
-              <div className="absolute bottom-10 right-[8%] w-52 h-24 bg-[#0f0f0f] border border-white/10 rounded-2xl p-4 flex items-center space-x-3">
-                <ShoppingCart size={32} className="text-purple-400" />
-                <div>
-                  <h4 className="font-ui font-bold">Resell</h4>
-                  <p className="text-xs text-white/50 font-mono">
-                    List on marketplaces for direct resale.
-                  </p>
-                </div>
-              </div>
-            </FloatCard>
-          </div>
-        </div>
       </header>
 
+
       {/* ==========================================
-          3. HOW IT WORKS
+          4. STATS SECTION (Dims the background visual / blender)
           ========================================== */}
-      <section id="how-it-works" className="relative py-32 bg-[#080808] text-white overflow-hidden">
-        {/* Subtle radial gradient background */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.06)_0%,transparent_75%)] opacity-40 z-0" />
-        {/* Dynamic decorative tech grid overlay */}
-        <div className="absolute inset-0 tech-grid tech-grid-glow pointer-events-none opacity-40 z-0" />
-
+      <section id="stats" className="relative py-24 bg-transparent border-y border-white/5 z-20 overflow-hidden">
+        {/* Dark solid overlay that dims background visuals/blender for readability */}
+        <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-xl z-0" />
+        
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-
-          <div className="text-center max-w-3xl mx-auto mb-24">
-            <FadeUp delay={0.2}>
-              <h2 className="font-mono text-xs sm:text-sm font-medium tracking-widest text-green-400 uppercase mb-2">Seamless Lifecycle</h2>
-            </FadeUp>
-            <FadeUp delay={0.4}>
-              <h3 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-3 leading-tight">
-                How the circular loop works.
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            {/* Stat 1 */}
+            <div className="text-center flex flex-col items-center">
+              <h3 className="text-4xl md:text-5xl font-black text-green-400 glow-green font-display">
+                <Counter value={18420} />+
               </h3>
-            </FadeUp>
-            <FadeUp delay={0.6}>
-              <p className="mt-5 text-lg text-white/70 leading-relaxed font-body">
-                We turn the linear model of &quot;buy, use, dump&quot; into a self-sustaining cycle in five steps.
-              </p>
-            </FadeUp>
-          </div>
-
-          {/* Steps Timeline Row */}
-          <div className="relative">
-
-            {/* Glowing flowing beam line for desktop (md and up) */}
-            <div className="hidden md:block absolute top-[76px] left-[8%] right-[8%] h-[3px] bg-slate-800/80 pointer-events-none z-0 rounded-full overflow-hidden">
-              <motion.div
-                initial={{ left: "-100%" }}
-                animate={{ left: "100%" }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-green-400/80 to-transparent"
-              />
+              <p className="mt-2 text-xs md:text-sm font-mono text-white/50 uppercase tracking-widest">Devices Restored</p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-6 relative z-10">
-              {stepsData.map((step, index) => {
-                const IconComponent = step.icon;
-                return (
-                  <FadeUp key={step.number} delay={0.2 + index * 0.15}>
-                    <motion.div
-                      whileHover="hover"
-                      className="group relative flex flex-col items-center text-center p-6 bg-[#111111]/60 hover:bg-[#161616]/90 border border-white/5 hover:border-white/15 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:shadow-[rgba(74,222,128,0.05)] cursor-pointer"
-                      style={{
-                        boxShadow: `hover: 0 0 30px ${step.glowColor}`
-                      }}
-                      custom={index}
-                    >
-                      {/* Step Number Badge */}
-                      <span className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-slate-900 border border-white/10 text-white font-bold text-xs flex items-center justify-center shadow-lg group-hover:border-green-400/50 transition-colors">
-                        {step.number}
-                      </span>
-
-                      {/* Icon with Hover Animation and Radial Glow */}
-                      <div className="relative w-24 h-24 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center relative shadow-lg group-hover:scale-105 group-hover:border-white/20 transition-all duration-300 overflow-hidden">
-                        {/* Interactive dynamic background radial mesh */}
-                        <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-40 group-hover:opacity-100 transition-opacity duration-300`} />
-                        
-                        {/* Icon */}
-                        <motion.div
-                          variants={step.iconVariants}
-                          className={`${step.textColor} relative z-10`}
-                        >
-                          <IconComponent className="w-10 h-10" />
-                        </motion.div>
-                      </div>
-
-                      {/* Step Info */}
-                      <h4 className="font-ui text-lg font-bold text-white mt-6 group-hover:text-green-400 transition-colors">
-                        {step.title}
-                      </h4>
-                      <p className="font-body text-sm text-white/60 mt-3 leading-relaxed">
-                        {step.desc}
-                      </p>
-                    </motion.div>
-                  </FadeUp>
-                );
-              })}
+            {/* Stat 2 */}
+            <div className="text-center flex flex-col items-center">
+              <h3 className="text-4xl md:text-5xl font-black text-green-400 glow-green font-display">
+                <Counter value={1420} /> Tons
+              </h3>
+              <p className="mt-2 text-xs md:text-sm font-mono text-white/50 uppercase tracking-widest">Carbon Offset</p>
+            </div>
+            {/* Stat 3 */}
+            <div className="text-center flex flex-col items-center">
+              <h3 className="text-4xl md:text-5xl font-black text-green-400 glow-green font-display">
+                ₹<Counter value={18} />M+
+              </h3>
+              <p className="mt-2 text-xs md:text-sm font-mono text-white/50 uppercase tracking-widest">Payouts Issued</p>
+            </div>
+            {/* Stat 4 */}
+            <div className="text-center flex flex-col items-center">
+              <h3 className="text-4xl md:text-5xl font-black text-green-400 glow-green font-display">
+                <Counter value={98} />%
+              </h3>
+              <p className="mt-2 text-xs md:text-sm font-mono text-white/50 uppercase tracking-widest">Mineral Recovery</p>
             </div>
           </div>
-
         </div>
+      </section>
+
+      {/* ==========================================
+          5. HOW IT WORKS (Sticky Stacking Parallax Cards)
+          ========================================== */}
+      <section id="how-it-works" className="relative bg-transparent text-white">
+        <div className="max-w-7xl mx-auto px-6 pt-24 pb-8 relative z-10 text-center">
+          <FadeUp delay={0.2}>
+            <h2 className="font-mono text-xs sm:text-sm font-medium tracking-widest text-green-400 uppercase mb-2">Seamless Lifecycle</h2>
+          </FadeUp>
+          <FadeUp delay={0.4}>
+            <h3 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-3 leading-tight">
+              How the circular loop works.
+            </h3>
+          </FadeUp>
+          <FadeUp delay={0.6}>
+            <p className="mt-5 text-lg text-white/70 leading-relaxed font-body max-w-3xl mx-auto">
+              We turn the linear model of &quot;buy, use, dump&quot; into a self-sustaining cycle in five interactive steps.
+            </p>
+          </FadeUp>
+        </div>
+        
+        <StickyCards />
       </section>
 
       {/* ==========================================
           4. CORE FEATURES
           ========================================== */}
-      <section id="features" className="relative py-32 bg-[#080808] text-white">
+      <section id="features" className="relative py-32 bg-transparent text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,222,128,0.03)_0%,transparent_70%)] opacity-35 z-0" />
         <div className="max-w-7xl mx-auto px-6 relative z-10">
 
@@ -938,7 +918,7 @@ export default function Home() {
       {/* ==========================================
           5. AI DECISION ENGINE SHOWCASE
           ========================================== */}
-      <section id="showcase" ref={showcaseRef} className="relative py-32 bg-[#0f0f0f] text-white overflow-hidden">
+      <section id="showcase" ref={showcaseRef} className="relative py-32 bg-transparent text-white overflow-hidden">
 
         {/* Decorative Grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#3341550c_1px,transparent_1px),linear-gradient(to_bottom,#3341550c_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
@@ -1187,7 +1167,7 @@ export default function Home() {
       {/* ==========================================
           6. MARKETPLACE PREVIEW
           ========================================== */}
-      <section id="marketplace" className="relative py-28 bg-[#080808] text-white">
+      <section id="marketplace" className="relative py-28 bg-transparent text-white">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
 
           <div className="text-center max-w-3xl mx-auto mb-20">
@@ -1348,7 +1328,7 @@ export default function Home() {
       {/* ==========================================
           7. FOOTER
           ========================================== */}
-      <footer className="bg-[#080808] text-white/70 border-t border-white/10 py-16">
+      <footer className="bg-transparent text-white/70 border-t border-white/10 py-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
 
@@ -1415,6 +1395,14 @@ export default function Home() {
 
         </div>
       </footer>
+
+      <style>{`
+        .hover-cta-glow:hover {
+          border-color: rgba(0, 234, 100, 0.45) !important;
+          box-shadow: 0 8px 36px rgba(0, 234, 100, 0.30) !important;
+          background: rgba(0, 234, 100, 0.06) !important;
+        }
+      `}</style>
 
     </div>
   );

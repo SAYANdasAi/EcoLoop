@@ -43,7 +43,7 @@ html {
   --font-ui: var(--font-outfit);
   --font-mono: var(--font-jetbrains-mono);
 }
-body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background-color: #030303; }
 h1, h2, h3 { font-family: var(--font-display); }
 code, pre, .font-mono { font-family: var(--font-mono); }
 .text-gradient {
