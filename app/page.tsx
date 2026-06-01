@@ -256,20 +256,20 @@ function HolographicScanner({ device, scanStep }: HolographicScannerProps) {
   const isScanning = scanStep > 0 && scanStep < 8;
   const isFinished = scanStep >= 8;
 
-  const screenGradeColor = !isFinished 
-    ? (scanStep === 4 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600") 
+  const screenGradeColor = !isFinished
+    ? (scanStep === 4 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600")
     : (device === "phone" ? "text-yellow-500" : "text-red-500");
 
-  const batteryGradeColor = !isFinished 
-    ? (scanStep === 5 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600") 
+  const batteryGradeColor = !isFinished
+    ? (scanStep === 5 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600")
     : (device === "phone" ? "text-yellow-500" : device === "laptop" ? "text-yellow-500" : "text-red-500");
 
-  const cameraGradeColor = !isFinished 
-    ? (scanStep === 6 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600") 
+  const cameraGradeColor = !isFinished
+    ? (scanStep === 6 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600")
     : "text-green-500";
 
-  const chassisGradeColor = !isFinished 
-    ? (scanStep === 7 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600") 
+  const chassisGradeColor = !isFinished
+    ? (scanStep === 7 ? "text-yellow-400 animate-pulse pulse-target" : "text-slate-600")
     : (device === "phone" ? "text-yellow-500" : device === "laptop" ? "text-yellow-500" : "text-red-500");
 
   return (
@@ -338,7 +338,7 @@ function HolographicScanner({ device, scanStep }: HolographicScannerProps) {
             {/* Lower deck */}
             <div className="w-full h-4 border-2 border-slate-700/80 bg-slate-800 rounded-t relative">
               <div className="w-20 h-1 bg-slate-950 rounded-b mx-auto" />
-              
+
               {/* Battery target (inside deck) */}
               <div className={`absolute top-[-30px] left-[20%] cursor-pointer z-10 transition-colors duration-300 ${batteryGradeColor}`} title="Battery health">
                 <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
@@ -682,11 +682,11 @@ export default function Home() {
               <span style={{ color: 'rgba(255, 255, 255, 0.22)', display: 'block' }}>The future of</span>
               <span style={{ color: 'rgba(255, 255, 255, 0.22)', display: 'block' }}>circular electronics</span>
               <span style={{ color: 'rgba(255, 255, 255, 0.88)', display: 'block' }}>
-                is 
+                is
                 <svg width="0.75em" height="0.75em" viewBox="0 0 32 32" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.15em', marginLeft: '0.15em' }}>
                   <path d="M16 2A14 14 0 0 0 2 16a1 1 0 0 0 2 0 12 12 0 1 1 24 0 1 1 0 0 0 2 0A14 14 0 0 0 16 2zm0 4a10 10 0 0 0-10 10 1 1 0 0 0 2 0 8 8 0 1 1 16 0 1 1 0 0 0 2 0 10 10 0 0 0-10-10zm0 4a6 6 0 0 0-6 6 1 1 0 0 0 2 0 4 4 0 1 1 8 0 1 1 0 0 0 2 0 6 6 0 0 0-6-6zm0 4a2 2 0 0 0-2 2v2a1 1 0 0 0 2 0v-2a2 2 0 0 0 0-4z" fill="#00ea64" />
                 </svg>
-                human + 
+                human +
                 <svg width="0.75em" height="0.75em" viewBox="0 0 32 32" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.15em', marginLeft: '0.15em' }}>
                   <defs>
                     <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -700,7 +700,7 @@ export default function Home() {
               </span>
             </h1>
           </FadeUp>
- 
+
           <FadeUp delay={0.8}>
             <p className="mt-6 text-lg md:text-xl text-white/55 max-w-3xl font-body">
               EcoLoop uses AI to determine the best second life for your used
@@ -708,7 +708,7 @@ export default function Home() {
               circular economy.
             </p>
           </FadeUp>
- 
+
           <FadeUp delay={1.0}>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
@@ -744,7 +744,7 @@ export default function Home() {
                   </div>
                 </div>
               </FloatCard>
-              
+
               <FloatCard amplitude={8} duration={5} rotate={-1} delay={0.2}>
                 <div className="bg-[#0f0f0f]/90 border border-white/10 rounded-2xl p-5 flex items-center space-x-4 shadow-xl hover:border-blue-400/30 transition-all duration-300">
                   <Wrench size={32} className="text-blue-400 flex-shrink-0" />
@@ -754,7 +754,7 @@ export default function Home() {
                   </div>
                 </div>
               </FloatCard>
-              
+
               <FloatCard amplitude={5} duration={4.5} rotate={2} delay={0.3}>
                 <div className="bg-[#0f0f0f]/90 border border-white/10 rounded-2xl p-5 flex items-center space-x-4 shadow-xl hover:border-yellow-400/30 transition-all duration-300">
                   <Package size={32} className="text-yellow-400 flex-shrink-0" />
@@ -764,7 +764,7 @@ export default function Home() {
                   </div>
                 </div>
               </FloatCard>
-              
+
               <FloatCard amplitude={7} duration={6} rotate={-2} delay={0.4}>
                 <div className="bg-[#0f0f0f]/90 border border-white/10 rounded-2xl p-5 flex items-center space-x-4 shadow-xl hover:border-purple-400/30 transition-all duration-300">
                   <ShoppingCart size={32} className="text-purple-400 flex-shrink-0" />
@@ -786,7 +786,7 @@ export default function Home() {
       <section id="stats" className="relative py-24 bg-transparent border-y border-white/5 z-20 overflow-hidden">
         {/* Dark solid overlay that dims background visuals/blender for readability */}
         <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-xl z-0" />
-        
+
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {/* Stat 1 */}
@@ -840,7 +840,7 @@ export default function Home() {
             </p>
           </FadeUp>
         </div>
-        
+
         <StickyCards />
       </section>
 
