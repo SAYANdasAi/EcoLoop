@@ -34,6 +34,7 @@ export default function InteractiveGridBg() {
     let animationFrameId: number;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
+    let isAnimating = false;
 
     // Grid spacing configuration
     const spacing = 95;
@@ -63,15 +64,25 @@ export default function InteractiveGridBg() {
 
     initNodes();
 
+    // Start/resume render loop
+    const startAnimating = () => {
+      if (!isAnimating) {
+        isAnimating = true;
+        render();
+      }
+    };
+
     // Mouse movement listener (global window to capture over other components)
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current.x = e.clientX;
       mouseRef.current.y = e.clientY;
       mouseRef.current.active = true;
+      startAnimating();
     };
 
     const handleMouseLeave = () => {
       mouseRef.current.active = false;
+      startAnimating();
     };
 
     // Click trigger for energy shockwaves
@@ -84,12 +95,14 @@ export default function InteractiveGridBg() {
         speed: 12,
         alpha: 1,
       });
+      startAnimating();
     };
 
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       initNodes();
+      startAnimating();
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -107,6 +120,7 @@ export default function InteractiveGridBg() {
 
       const mouse = mouseRef.current;
       const ripples = ripplesRef.current;
+      let needsSubsequentFrame = false;
 
       // Update ripples
       for (let i = ripples.length - 1; i >= 0; i--) {
@@ -115,7 +129,13 @@ export default function InteractiveGridBg() {
         r.alpha -= 0.015;
         if (r.alpha <= 0 || r.radius >= r.maxRadius) {
           ripples.splice(i, 1);
+        } else {
+          needsSubsequentFrame = true;
         }
+      }
+
+      if (mouse.active) {
+        needsSubsequentFrame = true;
       }
 
       // Update and displace nodes based on mouse & ripples
@@ -148,6 +168,16 @@ export default function InteractiveGridBg() {
         node.vy *= 0.82;
         node.x += node.vx;
         node.y += node.vy;
+
+        // Check if node is still moving/recovering to base coordinate
+        if (
+          Math.abs(node.vx) > 0.005 || 
+          Math.abs(node.vy) > 0.005 || 
+          Math.abs(dxBase) > 0.05 || 
+          Math.abs(dyBase) > 0.05
+        ) {
+          needsSubsequentFrame = true;
+        }
       });
 
       // Draw Grid Lines with dynamic alpha offsets near mouse/ripples
@@ -299,10 +329,15 @@ export default function InteractiveGridBg() {
         }
       });
 
-      animationFrameId = requestAnimationFrame(render);
+      if (needsSubsequentFrame) {
+        animationFrameId = requestAnimationFrame(render);
+      } else {
+        isAnimating = false;
+      }
     };
 
-    render();
+    // Draw the initial grid once on mount
+    startAnimating();
 
     return () => {
       cancelAnimationFrame(animationFrameId);

@@ -13,11 +13,10 @@
   justify-content: center;
   overflow: hidden;
 
-  // When any card inner wrapper is hovered, dim and blur all sibling card containers
+  // When any card inner wrapper is hovered, dim all sibling card containers
   &:has(.cardInnerWrapper:hover) {
     .cardContainer {
       opacity: 0.35;
-      filter: blur(1.5px) grayscale(20%);
     }
   }
 }
@@ -30,14 +29,12 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.3, 1), 
-              filter 0.5s cubic-bezier(0.25, 1, 0.3, 1);
+  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.3, 1);
 
   // When this container's specific inner wrapper is hovered, bring it to the absolute front and highlight it
   &:has(.cardInnerWrapper:hover) {
     z-index: 1000 !important;
     opacity: 1 !important;
-    filter: blur(0px) grayscale(0%) !important;
   }
 }
 

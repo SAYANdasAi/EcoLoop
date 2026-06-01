@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "@studio-freight/lenis";
 import { cards } from "../lib/data";
 import styles from "./StickyCards.module.scss";
 
@@ -156,32 +155,12 @@ export default function StickyCards() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Initialize Lenis smooth scroll
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
 
   // GSAP scroll trigger pinning & shuffling timeline
   useEffect(() => {
+    // Register ScrollTrigger inside the client effect to ensure proper environment context
+    gsap.registerPlugin(ScrollTrigger);
+
     const container = mainContainerRef.current;
     const stickyElement = container?.querySelector(`.${styles.stickyDeck}`);
     if (!container || !stickyElement) return;
@@ -250,7 +229,7 @@ export default function StickyCards() {
           trigger: container,
           start: "top top",
           end: "+=300%",
-          scrub: 1,
+          scrub: 0.5,
           pin: stickyElement,
           pinSpacing: true,
           invalidateOnRefresh: true,
@@ -329,7 +308,13 @@ export default function StickyCards() {
       });
     }, container);
 
+    // Refresh ScrollTrigger after a slight delay to ensure correct layout calculations
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
+
     return () => {
+      clearTimeout(refreshTimer);
       ctx.revert();
     };
   }, [windowWidth]);
