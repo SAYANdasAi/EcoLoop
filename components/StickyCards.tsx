@@ -1,363 +1,296 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cards } from "../lib/data";
 import styles from "./StickyCards.module.scss";
 
-// Register ScrollTrigger for client-side execution
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-interface CardProps {
-  i: number;
+// ---------------------------------------------------------------------------
+// Fan geometry
+// ---------------------------------------------------------------------------
+// Each card gets a rotation and horizontal offset so the deck fans out like
+// a hand of playing cards spread on a table.  The centre card stays upright;
+// cards further from centre tilt progressively more.
+// ---------------------------------------------------------------------------
+
+const getFanParams = (index: number, total: number) => {
+  const mid = (total - 1) / 2;
+  const t = (index - mid) / mid; // -1 … +1
+
+  const maxRotation = 22;   // degrees at the outermost position
+  const maxOffsetX = 260;  // px spread (desktop)
+  const maxOffsetY = 60;   // px vertical arc drop at the edges
+  const fanScale = 0.78; // scale while fanned
+
+  return {
+    rotate: t * maxRotation,
+    x: t * maxOffsetX,
+    // Arc: outer cards sit slightly lower than the centre one
+    y: Math.abs(t) * maxOffsetY,
+    scale: fanScale,
+  };
+};
+
+// ---------------------------------------------------------------------------
+// Card
+// ---------------------------------------------------------------------------
+
+interface CardData {
   title: string;
   description: string;
   src: string;
   url: string;
-  color: string;
+  color?: string;
+}
+
+interface CardProps extends CardData {
+  i: number;
+  total: number;
   cardRef: (el: HTMLDivElement | null) => void;
   cardInnerRef: (el: HTMLDivElement | null) => void;
 }
 
-// Convert hex colors to a premium translucent RGBA format for glassmorphism
-const hexToRGBA = (hex: string, alpha: number) => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
-
-function Card({
-  i,
-  title,
-  description,
-  src,
-  url,
-  color,
-  cardRef,
-  cardInnerRef,
-}: CardProps) {
+function Card({ i, total, title, description, src, url, color, cardRef, cardInnerRef }: CardProps) {
   const localInnerRef = useRef<HTMLDivElement | null>(null);
 
-  // 3D Tilt Hover effect using GSAP quickTo for buttery performance
+  // 3-D tilt on hover
   useEffect(() => {
-    const cardInner = localInnerRef.current;
-    if (!cardInner) return;
+    const el = localInnerRef.current;
+    if (!el) return;
 
-    // quickTo helpers for ultra-smooth 60fps movement
-    const xTo = gsap.quickTo(cardInner, "rotateY", { duration: 0.4, ease: "power2.out" });
-    const yTo = gsap.quickTo(cardInner, "rotateX", { duration: 0.4, ease: "power2.out" });
-    
-    // Smooth hover scale/translate using GSAP to replace CSS transition
-    const handleMouseEnter = () => {
-      // Get responsive values similar to CSS
-      const isMobile = window.innerWidth <= 768;
-      const isTablet = window.innerWidth <= 1024 && !isMobile;
-      
-      const scaleVal = isMobile ? 2.2 : isTablet ? 1.95 : 1.75;
-      const yVal = isMobile ? -20 : isTablet ? -30 : -40;
+    const xTo = gsap.quickTo(el, "rotateY", { duration: 0.35, ease: "power2.out" });
+    const yTo = gsap.quickTo(el, "rotateX", { duration: 0.35, ease: "power2.out" });
 
-      gsap.to(cardInner, {
-        scale: scaleVal,
-        y: yVal,
-        duration: 0.5,
-        ease: "power2.out",
-        overwrite: "auto"
-      });
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      xTo(((e.clientX - r.left) / r.width - 0.5) * 12);
+      yTo(-((e.clientY - r.top) / r.height - 0.5) * 12);
     };
+    const onLeave = () => { xTo(0); yTo(0); };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = cardInner.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-      
-      const mouseX = (e.clientX - rect.left) / width - 0.5;
-      const mouseY = (e.clientY - rect.top) / height - 0.5;
-      
-      xTo(mouseX * 10);
-      yTo(-mouseY * 10);
-    };
-
-    const handleMouseLeave = () => {
-      xTo(0);
-      yTo(0);
-      gsap.to(cardInner, {
-        scale: 1,
-        y: 0,
-        duration: 0.5,
-        ease: "power2.out",
-        overwrite: "auto"
-      });
-    };
-
-    cardInner.addEventListener("mouseenter", handleMouseEnter);
-    cardInner.addEventListener("mousemove", handleMouseMove);
-    cardInner.addEventListener("mouseleave", handleMouseLeave);
-
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
     return () => {
-      cardInner.removeEventListener("mouseenter", handleMouseEnter);
-      cardInner.removeEventListener("mousemove", handleMouseMove);
-      cardInner.removeEventListener("mouseleave", handleMouseLeave);
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
     };
   }, []);
 
   return (
-    <div 
-      ref={cardRef} 
+    <div
+      ref={cardRef}
       className={styles.cardContainer}
     >
-      <div className={styles.cardInnerWrapper}>
-        <div
-          ref={(el) => {
-            localInnerRef.current = el;
-            cardInnerRef(el);
-          }}
-          className={styles.cardInner}
-          style={{
-            backgroundColor: hexToRGBA(color, 0.65), // Translucent glassmorphism base
-            transformStyle: "preserve-3d",
-          }}
-        >
-          {/* Card Left Column with Parallax Text (floating in 3D Z-plane) */}
-          <div className={styles.leftColumn} style={{ transform: "translateZ(30px)", transformStyle: "preserve-3d" }}>
-            <div className={styles.textGroup}>
-              <h2 className={styles.cardTitle}>{title}</h2>
-              <p className={styles.cardDesc}>{description}</p>
-            </div>
-            <a href={url} className={styles.cardLink}>
-              <span>See more</span>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </a>
-          </div>
+      <div
+        ref={(el) => {
+          localInnerRef.current = el;
+          cardInnerRef(el);
+        }}
+        className={styles.cardInner}
+        style={{
+          transformStyle: "preserve-3d",
+          backgroundColor: color || "#18181b"
+        }}
+      >
+        {/* Relevant image in the upper section */}
+        <div className={styles.imageWrapper}>
+          <Image
+            src={src}
+            alt={title}
+            fill
+            priority={i < 3}
+            sizes="(max-width: 768px) 60vw, 280px"
+            className="object-cover"
+          />
+        </div>
 
-          {/* Card Right Column with Parallax Image (floating in higher Z-plane) */}
-          <div className={styles.rightColumn} style={{ transform: "translateZ(45px)", transformStyle: "preserve-3d" }}>
-            <div className={styles.imageOuterWrapper}>
-              <div className={styles.imageInner}>
-                <Image
-                  src={src}
-                  alt={title}
-                  fill
-                  priority={i < 2}
-                  sizes="(max-width: 768px) 100vw, 30vw"
-                  className="object-cover"
-                />
-              </div>
-            </div>
+        {/* Content Section (text + link) */}
+        <div className={styles.cardContent}>
+          <div className={styles.textGroup}>
+            <h2 className={styles.cardTitle}>{title}</h2>
+            <p className={styles.cardDesc}>{description}</p>
           </div>
+          <a href={url} className={styles.cardLink}>
+            <span>See more</span>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
         </div>
       </div>
     </div>
   );
 }
 
+// ---------------------------------------------------------------------------
+// StickyCards
+// ---------------------------------------------------------------------------
+
 export default function StickyCards() {
-  const mainContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const deckRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardInnerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [windowWidth, setWindowWidth] = useState(1000);
 
-  // Track responsive screen width for dynamic card fanning spacing
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setWindowWidth(window.innerWidth);
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-
-  // GSAP scroll trigger pinning & shuffling timeline
-  useEffect(() => {
-    // Register ScrollTrigger inside the client effect to ensure proper environment context
     gsap.registerPlugin(ScrollTrigger);
 
-    const container = mainContainerRef.current;
-    const stickyElement = container?.querySelector(`.${styles.stickyDeck}`);
-    if (!container || !stickyElement) return;
+    const container = containerRef.current;
+    const deck = deckRef.current;
+    if (!container || !deck) return;
 
-    const cardsElements = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
-    if (cardsElements.length === 0) return;
+    const inners = cardInnerRefs.current.filter(Boolean) as HTMLDivElement[];
+    const outers = cardRefs.current.filter(Boolean) as HTMLDivElement[];
+    const total = inners.length;
 
-    const cardWrappers = cardsElements.map(el => el.querySelector(`.${styles.cardInnerWrapper}`));
-    const cardImages = cardsElements.map(el => el.querySelector(`.${styles.imageInner}`));
-    const cardTexts = cardsElements.map(el => el.querySelector(`.${styles.textGroup}`));
-    const innerCards = cardInnerRefs.current.filter((el): el is HTMLDivElement => el !== null);
+    // --- initial stacked state -------------------------------------------
+    // All cards sit on top of each other, the top card is centred.
+    // Each card is slightly smaller and offset downward than the one above.
+    outers.forEach((el, i) => {
+      const depth = total - 1 - i; // 0 = top card
+      gsap.set(el, { zIndex: total - depth });
+    });
 
+    inners.forEach((el, i) => {
+      const depth = total - 1 - i;
+      gsap.set(el, {
+        scale: 1 - depth * 0.04,
+        y: depth * 14,
+        rotate: (depth % 3 - 1) * 2,
+        x: 0,
+        opacity: 1,
+      });
+    });
+
+    // --- entrance fade-in ------------------------------------------------
+    gsap.fromTo(
+      inners,
+      { opacity: 0, y: 60 },
+      {
+        opacity: 1, y: 0,
+        duration: 0.7,
+        stagger: 0.06,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: container,
+          start: "top 80%",
+          once: true,
+        },
+      }
+    );
+
+    // --- scroll-driven fan-out -------------------------------------------
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      mm.add({
-        isDesktop: "(min-width: 1024px)",
-        isTablet: "(min-width: 640px) and (max-width: 1023px)",
-        isMobile: "(max-width: 639px)"
-      }, (context) => {
-        const { isDesktop, isTablet } = context.conditions as any;
-        
-        // 1. Initialize initial stacked states
-        cardsElements.forEach((el, i) => {
-          const wrapper = cardWrappers[i];
-          if (!wrapper) return;
-          
-          const initScale = 0.9 - i * 0.035;
-          const initY = i * 12;
-          const initRotate = (i % 3 - 1) * 1.5;
-          const initZIndex = cardsElements.length - i;
+      mm.add(
+        {
+          isDesktop: "(min-width: 1024px)",
+          isTablet: "(min-width: 640px) and (max-width: 1023px)",
+          isMobile: "(max-width: 639px)",
+        },
+        (context) => {
+          const { isDesktop, isTablet } = context.conditions as Record<string, boolean>;
 
-          gsap.set(wrapper, {
-            scale: initScale,
-            y: initY,
-            x: 0,
-            rotate: initRotate,
-            willChange: "transform, opacity",
-          });
+          const xMultiplier = isDesktop ? 1.25 : isTablet ? 0.85 : 0.55;
+          const yMultiplier = isDesktop ? 1 : isTablet ? 0.75 : 0.6;
+          const rotMult = isDesktop ? 1 : isTablet ? 0.8 : 0.65;
+          const fanScale = isDesktop ? 0.82 : isTablet ? 0.76 : 0.70;
 
-          gsap.set(el, {
-            zIndex: initZIndex,
-          });
-        });
+          const mid = (total - 1) / 2;
 
-        // 2. Initialize internal card parallax elements
-        cardsElements.forEach((el, i) => {
-          const img = cardImages[i];
-          const text = cardTexts[i];
-          if (img) gsap.set(img, { scale: 1.25, y: -25, willChange: "transform" });
-          if (text) gsap.set(text, { y: 30, willChange: "transform" });
-        });
-
-        // 3. Reveal entrance animation
-        gsap.fromTo(
-          innerCards,
-          { opacity: 0, y: 80, scale: 0.92 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.85,
-            stagger: 0.08,
-            ease: "power3.out",
+          const tl = gsap.timeline({
             scrollTrigger: {
               trigger: container,
-              start: "top 85%",
-              once: true,
+              start: "top top",
+              end: "+=200%",
+              scrub: 0.6,
+              pin: deck,
+              pinSpacing: true,
+              invalidateOnRefresh: true,
+              anticipatePin: 1,
             },
-          }
-        );
+          });
 
-        // 4. Main fanning & shuffling timeline
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: container,
-            start: "top top",
-            end: "+=250%", // Slightly shorter end for tighter feel
-            scrub: 0.1, // Much more responsive than 0.5
-            pin: stickyElement,
-            pinSpacing: true,
-            invalidateOnRefresh: true,
-            anticipatePin: 1, // Smoother pinning entry
-          }
-        });
+          // Phase 1 (0 → 0.5): stack → fan
+          inners.forEach((el, i) => {
+            const t = (i - mid) / (mid || 1);
+            const maxR = 22 * rotMult;
+            const maxX = 320 * xMultiplier;
+            const maxY = 60 * yMultiplier;
 
-        cardsElements.forEach((el, i) => {
-          const wrapper = cardWrappers[i];
-          const img = cardImages[i];
-          const text = cardTexts[i];
-          if (!wrapper) return;
+            tl.to(
+              el,
+              {
+                rotate: t * maxR,
+                x: t * maxX,
+                y: Math.abs(t) * maxY,
+                scale: fanScale,
+                ease: "power2.inOut",
+                duration: 0.5,
+              },
+              0
+            );
+          });
 
-          const angle = (i * 360) / 5 - 90;
-          const angleRad = (angle * Math.PI) / 180;
-          
-          const radius = isDesktop ? 250 : isTablet ? 180 : 110;
-          const fanScale = isDesktop ? 0.52 : isTablet ? 0.45 : 0.38;
-
-          const fanX = radius * Math.cos(angleRad);
-          const fanY = radius * Math.sin(angleRad);
-          const fanRotate = (i - 2) * 10; 
-
-          const revScale = 0.9 - (4 - i) * 0.035;
-          const revY = (4 - i) * 12;
-          const revX = 0;
-          const revRotate = ((4 - i) % 3 - 1) * 1.5;
-
-          tl.to(wrapper, {
-            x: fanX,
-            y: fanY,
-            scale: fanScale,
-            rotate: fanRotate,
-            duration: 0.3,
-            ease: "power2.inOut",
-          }, 0.15);
-
-          tl.to(wrapper, {
-            x: revX,
-            y: revY,
-            scale: revScale,
-            rotate: revRotate,
-            duration: 0.3,
-            ease: "power2.inOut",
-          }, 0.45);
-
-          if (img) {
-            tl.to(img, {
-              scale: 1.0,
-              y: 25,
-              duration: 0.6,
-              ease: "power1.inOut",
-            }, 0.15);
-          }
-          if (text) {
-            tl.to(text, {
-              y: -30,
-              duration: 0.6,
-              ease: "power1.inOut",
-            }, 0.15);
-          }
-        });
-
-        cardsElements.forEach((el, i) => {
-          tl.set(el, { zIndex: cardsElements.length - i }, 0);
-          tl.set(el, { zIndex: i + 1 }, 0.45);
-        });
-      });
+          // Phase 2 (0.5 → 1): fan holds (nothing to do — just let scrub sit)
+        }
+      );
     }, container);
+
+    // --- hover: lift hovered card, dim siblings --------------------------
+    inners.forEach((el, i) => {
+      const siblings = inners.filter((_, j) => j !== i);
+
+      el.addEventListener("mouseenter", () => {
+        gsap.to(el, { y: "-=40", scale: "+=0.04", duration: 0.4, ease: "power2.out", overwrite: "auto" });
+        gsap.to(siblings, { opacity: 0.28, duration: 0.3, ease: "power2.out" });
+        gsap.to(outers[i], { zIndex: 999, duration: 0 });
+      });
+
+      el.addEventListener("mouseleave", () => {
+        // Restore y and scale to whatever the scroll timeline has set
+        ScrollTrigger.refresh(true);
+        gsap.to(el, { scale: gsap.getProperty(el, "scale"), duration: 0.4, ease: "power2.out", overwrite: "auto" });
+        gsap.to(siblings, { opacity: 1, duration: 0.4, ease: "power2.out" });
+        gsap.to(outers[i], { zIndex: total - (total - 1 - i), duration: 0 });
+      });
+    });
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <main ref={mainContainerRef} className={styles.mainContainer}>
-      <div className={styles.stickyDeck}>
+    <main ref={containerRef} className={styles.mainContainer}>
+      <div ref={deckRef} className={styles.stickyDeck}>
         {cards.map((card, i) => (
           <Card
             key={card.title}
             i={i}
+            total={cards.length}
             title={card.title}
             description={card.description}
             src={card.src}
             url={card.url}
-            color={card.color || "#111111"}
-            cardRef={(el) => {
-              cardRefs.current[i] = el;
-            }}
-            cardInnerRef={(el) => {
-              cardInnerRefs.current[i] = el;
-            }}
+            color={card.color}
+            cardRef={(el) => { cardRefs.current[i] = el; }}
+            cardInnerRef={(el) => { cardInnerRefs.current[i] = el; }}
           />
         ))}
       </div>

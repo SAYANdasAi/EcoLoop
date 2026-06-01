@@ -1,9 +1,14 @@
+// ---------------------------------------------------------------------------
+// StickyCards — portrait fan layout
+// ---------------------------------------------------------------------------
+
 .mainContainer {
   position: relative;
   width: 100%;
   background-color: transparent;
 }
 
+// The sticky viewport that gets pinned by GSAP ScrollTrigger
 .stickyDeck {
   position: relative;
   height: 100vh;
@@ -11,187 +16,187 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible; // cards fan outside centre bounds
 
-  // When any card inner wrapper is hovered, dim all sibling card containers
-  &:has(.cardInnerWrapper:hover) {
-    .cardContainer {
-      opacity: 0.35;
-    }
+  // When any card is hovered, restore opacity on the hovered one (GSAP handles
+  // siblings; the CSS fallback ensures the hovered card itself stays visible)
+  &:has(.cardInner:hover) .cardInner:not(:hover) {
+    // GSAP overrides this via inline style — leave blank intentionally.
+    // The rule keeps specificity balanced for the GSAP opacity restoration.
   }
 }
 
+// Wrapper that GSAP transforms (scale / rotate / translate)
 .cardContainer {
   position: absolute;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 320px;
+  height: 460px;
+  transform-origin: center bottom; // fan pivots from the base of the deck
+  transform-style: preserve-3d;
   pointer-events: none;
-  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.3, 1);
+  will-change: transform, opacity;
 
-  // When this container's specific inner wrapper is hovered, bring it to the absolute front and highlight it
-  &:has(.cardInnerWrapper:hover) {
-    z-index: 1000 !important;
-    opacity: 1 !important;
+  @media (max-width: 1024px) {
+    width: 270px;
+    height: 390px;
+  }
+
+  @media (max-width: 640px) {
+    width: 190px;
+    height: 280px;
   }
 }
 
-.cardInnerWrapper {
+// The visible card — full-bleed image + text overlay
+.cardInner {
   position: relative;
-  width: 90%;
-  max-width: 1000px;
-  height: 480px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform-origin: center center;
-  perspective: 1000px; /* Enable beautiful 3D tilt hover! */
-  transform-style: preserve-3d;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
   pointer-events: auto;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition:
+    box-shadow 0.4s cubic-bezier(0.25, 1, 0.3, 1),
+    outline 0.2s;
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  box-sizing: border-box;
 
   &:hover {
-    .cardInner {
-      box-shadow: 0 45px 90px rgba(0, 234, 100, 0.22), 0 0 0 2px rgba(0, 234, 100, 0.35);
-      border-color: rgba(0, 234, 100, 0.55);
+    box-shadow:
+      0 40px 80px rgba(0, 0, 0, 0.7),
+      0 0 0 1.5px rgba(255, 255, 255, 0.25);
+    outline: none;
+
+    .imageWrapper img {
+      transform: scale(1.05);
     }
+  }
+
+  &:focus-visible {
+    outline: 2px solid #00ea64;
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 640px) {
+    border-radius: 18px;
+    padding: 10px;
+  }
+}
+
+// Rounded header image wrapper
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  background-color: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+
+  img {
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.3, 1);
   }
 
   @media (max-width: 1024px) {
-    &:hover {
-      .cardInner {
-        // Handled by GSAP
-      }
-    }
+    height: 160px;
+    border-radius: 12px;
+    margin-bottom: 14px;
   }
 
-  @media (max-width: 768px) {
-    width: 95%;
-    height: auto;
-    max-height: 85vh;
-
-    &:hover {
-      .cardInner {
-        // Handled by GSAP
-      }
-    }
+  @media (max-width: 640px) {
+    height: 110px;
+    border-radius: 10px;
+    margin-bottom: 10px;
   }
 }
 
-.cardInner {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: 100%;
-  border-radius: 28px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.12); /* Slightly brighter glass border */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-  padding: 48px;
-  gap: 32px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  transition: box-shadow 0.5s cubic-bezier(0.25, 1, 0.3, 1),
-              border-color 0.5s cubic-bezier(0.25, 1, 0.3, 1);
-  will-change: transform, box-shadow;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    height: auto;
-    padding: 32px;
-    gap: 24px;
-  }
-}
-
-.leftColumn {
-  flex: 1;
+// Inner container for card metadata
+.cardContent {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
-  z-index: 10;
-
-  @media (max-width: 768px) {
-    gap: 16px;
-  }
+  flex-grow: 1;
+  padding: 0 4px 4px;
 }
 
 .textGroup {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .cardTitle {
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(28px, 4vw, 40px);
+  font-size: clamp(16px, 2.2vw, 20px);
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.1;
+  line-height: 1.25;
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .cardDesc {
   font-family: var(--font-body), sans-serif;
-  font-size: clamp(14px, 2vw, 16px);
+  font-size: clamp(11px, 1.4vw, 12.5px);
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.5;
-  max-width: 480px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.45;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  // Hide description on very small cards to avoid clutter
+  @media (max-width: 640px) {
+    display: none;
+  }
 }
 
 .cardLink {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-family: var(--font-ui), sans-serif;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
   color: #ffffff;
   text-decoration: none;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   width: fit-content;
-  border-bottom: 1.5px solid transparent;
   padding-bottom: 2px;
-  transition: border-color 0.25s, gap 0.25s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  transition:
+    border-color 0.2s,
+    gap 0.2s;
+  margin-top: 12px;
 
   svg {
-    transition: transform 0.25s;
+    transition: transform 0.2s;
+    flex-shrink: 0;
   }
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.8);
-    gap: 12px;
+    border-color: rgba(255, 255, 255, 0.9);
+    gap: 10px;
+
     svg {
-      transform: translateX(4px);
+      transform: translateX(3px);
     }
   }
-}
 
-.rightColumn {
-  position: relative;
-  width: 32%;
-  height: 100%;
-  border-radius: 18px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  @media (max-width: 768px) {
-    width: 100%;
-    height: 200px;
-    flex-shrink: 0;
+  @media (max-width: 640px) {
+    font-size: 10px;
+    margin-top: 8px;
   }
-}
-
-.imageOuterWrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.imageInner {
-  width: 100%;
-  height: 100%;
-  position: relative;
 }

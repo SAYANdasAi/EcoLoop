@@ -40,7 +40,75 @@ export default function InteractiveGridBg() {
     const spacing = 120;
     let nodes: Node[] = [];
 
-    // ... (initNodes remains same)
+    // Initialize nodes at grid intersections
+    const initNodes = () => {
+      nodes = [];
+      const cols = Math.ceil(width / spacing) + 1;
+      const rows = Math.ceil(height / spacing) + 1;
+
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+          const x = c * spacing;
+          const y = r * spacing;
+          nodes.push({
+            x,
+            y,
+            baseX: x,
+            baseY: y,
+            vx: 0,
+            vy: 0,
+          });
+        }
+      }
+    };
+
+    initNodes();
+
+    // Start/resume render loop
+    const startAnimating = () => {
+      if (!isAnimating) {
+        isAnimating = true;
+        render();
+      }
+    };
+
+    // Mouse movement listener (global window to capture over other components)
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
+      mouseRef.current.active = true;
+      startAnimating();
+    };
+
+    const handleMouseLeave = () => {
+      mouseRef.current.active = false;
+      startAnimating();
+    };
+
+    // Click trigger for energy shockwaves
+    const handleWindowClick = (e: MouseEvent) => {
+      ripplesRef.current.push({
+        x: e.clientX,
+        y: e.clientY,
+        radius: 0,
+        maxRadius: Math.max(width, height) * 0.8,
+        speed: 12,
+        alpha: 1,
+      });
+      startAnimating();
+    };
+
+    const handleResize = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initNodes();
+      startAnimating();
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("click", handleWindowClick);
+    window.addEventListener("resize", handleResize);
 
     // Check if any node is still moving significantly
     const checkNodeStability = () => {
