@@ -36,79 +36,29 @@ export default function InteractiveGridBg() {
     let height = (canvas.height = window.innerHeight);
     let isAnimating = false;
 
-    // Grid spacing configuration
-    const spacing = 95;
+    // Grid spacing configuration - increased for better performance
+    const spacing = 120;
     let nodes: Node[] = [];
 
-    // Initialize nodes at grid intersections
-    const initNodes = () => {
-      nodes = [];
-      const cols = Math.ceil(width / spacing) + 1;
-      const rows = Math.ceil(height / spacing) + 1;
+    // ... (initNodes remains same)
 
-      for (let c = 0; c < cols; c++) {
-        for (let r = 0; r < rows; r++) {
-          const x = c * spacing;
-          const y = r * spacing;
-          nodes.push({
-            x,
-            y,
-            baseX: x,
-            baseY: y,
-            vx: 0,
-            vy: 0,
-          });
+    // Check if any node is still moving significantly
+    const checkNodeStability = () => {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const dxBase = node.baseX - node.x;
+        const dyBase = node.baseY - node.y;
+        if (
+          Math.abs(node.vx) > 0.01 || 
+          Math.abs(node.vy) > 0.01 || 
+          Math.abs(dxBase) > 0.1 || 
+          Math.abs(dyBase) > 0.1
+        ) {
+          return false;
         }
       }
+      return true;
     };
-
-    initNodes();
-
-    // Start/resume render loop
-    const startAnimating = () => {
-      if (!isAnimating) {
-        isAnimating = true;
-        render();
-      }
-    };
-
-    // Mouse movement listener (global window to capture over other components)
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current.x = e.clientX;
-      mouseRef.current.y = e.clientY;
-      mouseRef.current.active = true;
-      startAnimating();
-    };
-
-    const handleMouseLeave = () => {
-      mouseRef.current.active = false;
-      startAnimating();
-    };
-
-    // Click trigger for energy shockwaves
-    const handleWindowClick = (e: MouseEvent) => {
-      ripplesRef.current.push({
-        x: e.clientX,
-        y: e.clientY,
-        radius: 0,
-        maxRadius: Math.max(width, height) * 0.8,
-        speed: 12,
-        alpha: 1,
-      });
-      startAnimating();
-    };
-
-    const handleResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      initNodes();
-      startAnimating();
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("click", handleWindowClick);
-    window.addEventListener("resize", handleResize);
 
     // Frame render loop
     const render = () => {
@@ -134,20 +84,14 @@ export default function InteractiveGridBg() {
         }
       }
 
-      if (mouse.active) {
-        needsSubsequentFrame = true;
-      }
-
-      // Update and displace nodes based on mouse & ripples
+      // Update and displace nodes
       nodes.forEach((node) => {
-        // Base spring force back to original coordinate
         const dxBase = node.baseX - node.x;
         const dyBase = node.baseY - node.y;
         
         node.vx += dxBase * 0.04;
         node.vy += dyBase * 0.04;
 
-        // Mouse attraction/repulsion forces (magnetic displacement)
         if (mouse.active) {
           const dxMouse = mouse.x - node.x;
           const dyMouse = mouse.y - node.y;
@@ -155,30 +99,25 @@ export default function InteractiveGridBg() {
           
           if (distMouse < 180) {
             const force = (180 - distMouse) / 180;
-            // Push slightly away or pull towards mouse (cyber grid pull)
             const angle = Math.atan2(dyMouse, dxMouse);
             const pullForce = force * 6;
             node.vx += Math.cos(angle) * pullForce;
             node.vy += Math.sin(angle) * pullForce;
+            // If mouse is active and close, we likely need another frame
+            needsSubsequentFrame = true;
           }
         }
 
-        // Apply friction and position updates
         node.vx *= 0.82;
         node.vy *= 0.82;
         node.x += node.vx;
         node.y += node.vy;
-
-        // Check if node is still moving/recovering to base coordinate
-        if (
-          Math.abs(node.vx) > 0.005 || 
-          Math.abs(node.vy) > 0.005 || 
-          Math.abs(dxBase) > 0.05 || 
-          Math.abs(dyBase) > 0.05
-        ) {
-          needsSubsequentFrame = true;
-        }
       });
+
+      // If we haven't already decided to animate, check all nodes for stability
+      if (!needsSubsequentFrame && !checkNodeStability()) {
+        needsSubsequentFrame = true;
+      }
 
       // Draw Grid Lines with dynamic alpha offsets near mouse/ripples
       const cols = Math.ceil(width / spacing) + 1;

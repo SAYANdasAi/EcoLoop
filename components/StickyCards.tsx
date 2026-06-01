@@ -51,6 +51,24 @@ function Card({
     // quickTo helpers for ultra-smooth 60fps movement
     const xTo = gsap.quickTo(cardInner, "rotateY", { duration: 0.4, ease: "power2.out" });
     const yTo = gsap.quickTo(cardInner, "rotateX", { duration: 0.4, ease: "power2.out" });
+    
+    // Smooth hover scale/translate using GSAP to replace CSS transition
+    const handleMouseEnter = () => {
+      // Get responsive values similar to CSS
+      const isMobile = window.innerWidth <= 768;
+      const isTablet = window.innerWidth <= 1024 && !isMobile;
+      
+      const scaleVal = isMobile ? 2.2 : isTablet ? 1.95 : 1.75;
+      const yVal = isMobile ? -20 : isTablet ? -30 : -40;
+
+      gsap.to(cardInner, {
+        scale: scaleVal,
+        y: yVal,
+        duration: 0.5,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    };
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = cardInner.getBoundingClientRect();
@@ -67,12 +85,21 @@ function Card({
     const handleMouseLeave = () => {
       xTo(0);
       yTo(0);
+      gsap.to(cardInner, {
+        scale: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
     };
 
+    cardInner.addEventListener("mouseenter", handleMouseEnter);
     cardInner.addEventListener("mousemove", handleMouseMove);
     cardInner.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
+      cardInner.removeEventListener("mouseenter", handleMouseEnter);
       cardInner.removeEventListener("mousemove", handleMouseMove);
       cardInner.removeEventListener("mouseleave", handleMouseLeave);
     };
@@ -174,150 +201,144 @@ export default function StickyCards() {
     const innerCards = cardInnerRefs.current.filter((el): el is HTMLDivElement => el !== null);
 
     const ctx = gsap.context(() => {
-      // 1. Initialize initial stacked states for wrapper containers and z-indices on parent containers
-      cardsElements.forEach((el, i) => {
-        const wrapper = cardWrappers[i];
-        if (!wrapper) return;
+      const mm = gsap.matchMedia();
+
+      mm.add({
+        isDesktop: "(min-width: 1024px)",
+        isTablet: "(min-width: 640px) and (max-width: 1023px)",
+        isMobile: "(max-width: 639px)"
+      }, (context) => {
+        const { isDesktop, isTablet } = context.conditions as any;
         
-        const initScale = 0.9 - i * 0.035;
-        const initY = i * 12;
-        const initRotate = (i % 3 - 1) * 1.5;
-        const initZIndex = cardsElements.length - i;
+        // 1. Initialize initial stacked states
+        cardsElements.forEach((el, i) => {
+          const wrapper = cardWrappers[i];
+          if (!wrapper) return;
+          
+          const initScale = 0.9 - i * 0.035;
+          const initY = i * 12;
+          const initRotate = (i % 3 - 1) * 1.5;
+          const initZIndex = cardsElements.length - i;
 
-        gsap.set(wrapper, {
-          scale: initScale,
-          y: initY,
-          x: 0,
-          rotate: initRotate,
+          gsap.set(wrapper, {
+            scale: initScale,
+            y: initY,
+            x: 0,
+            rotate: initRotate,
+            willChange: "transform, opacity",
+          });
+
+          gsap.set(el, {
+            zIndex: initZIndex,
+          });
         });
 
-        gsap.set(el, {
-          zIndex: initZIndex,
+        // 2. Initialize internal card parallax elements
+        cardsElements.forEach((el, i) => {
+          const img = cardImages[i];
+          const text = cardTexts[i];
+          if (img) gsap.set(img, { scale: 1.25, y: -25, willChange: "transform" });
+          if (text) gsap.set(text, { y: 30, willChange: "transform" });
         });
-      });
 
-      // 2. Initialize internal card parallax elements starting state
-      cardsElements.forEach((el, i) => {
-        const img = cardImages[i];
-        const text = cardTexts[i];
-        if (img) gsap.set(img, { scale: 1.25, y: -25 });
-        if (text) gsap.set(text, { y: 30 });
-      });
+        // 3. Reveal entrance animation
+        gsap.fromTo(
+          innerCards,
+          { opacity: 0, y: 80, scale: 0.92 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.85,
+            stagger: 0.08,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: container,
+              start: "top 85%",
+              once: true,
+            },
+          }
+        );
 
-      // 3. Reveal entrance animation for the inner cards once they enter viewport
-      gsap.fromTo(
-        innerCards,
-        { opacity: 0, y: 80, scale: 0.92 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.85,
-          stagger: 0.08,
-          ease: "power3.out",
+        // 4. Main fanning & shuffling timeline
+        const tl = gsap.timeline({
           scrollTrigger: {
             trigger: container,
-            start: "top 80%",
-            once: true,
-          },
-        }
-      );
+            start: "top top",
+            end: "+=250%", // Slightly shorter end for tighter feel
+            scrub: 0.1, // Much more responsive than 0.5
+            pin: stickyElement,
+            pinSpacing: true,
+            invalidateOnRefresh: true,
+            anticipatePin: 1, // Smoother pinning entry
+          }
+        });
 
-      // 4. Create the main fanning & shuffling scrolltrigger timeline
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: container,
-          start: "top top",
-          end: "+=300%",
-          scrub: 0.5,
-          pin: stickyElement,
-          pinSpacing: true,
-          invalidateOnRefresh: true,
-        }
-      });
+        cardsElements.forEach((el, i) => {
+          const wrapper = cardWrappers[i];
+          const img = cardImages[i];
+          const text = cardTexts[i];
+          if (!wrapper) return;
 
-      cardsElements.forEach((el, i) => {
-        const wrapper = cardWrappers[i];
-        const img = cardImages[i];
-        const text = cardTexts[i];
-        if (!wrapper) return;
+          const angle = (i * 360) / 5 - 90;
+          const angleRad = (angle * Math.PI) / 180;
+          
+          const radius = isDesktop ? 250 : isTablet ? 180 : 110;
+          const fanScale = isDesktop ? 0.52 : isTablet ? 0.45 : 0.38;
 
-        // Circular loop radial position math:
-        // Distribute the 5 cards evenly (72-degree increments) around a 360-degree loop.
-        const angle = (i * 360) / 5 - 90; // Top starts at -90 degrees
-        const angleRad = (angle * Math.PI) / 180;
-        
-        // Responsive loop radius and cards scaling values to perfectly fit different screens
-        const radius = windowWidth < 640 ? 110 : windowWidth < 1024 ? 180 : 250;
-        const fanScale = windowWidth < 640 ? 0.38 : windowWidth < 1024 ? 0.45 : 0.52;
+          const fanX = radius * Math.cos(angleRad);
+          const fanY = radius * Math.sin(angleRad);
+          const fanRotate = (i - 2) * 10; 
 
-        const fanX = radius * Math.cos(angleRad);
-        const fanY = radius * Math.sin(angleRad);
-        // A gentle, readable radial tilt so they fan organically along the curve without being upside down
-        const fanRotate = (i - 2) * 10; 
+          const revScale = 0.9 - (4 - i) * 0.035;
+          const revY = (4 - i) * 12;
+          const revX = 0;
+          const revRotate = ((4 - i) % 3 - 1) * 1.5;
 
-        // Reversed stacked targets (at progress 0.75)
-        const revScale = 0.9 - (4 - i) * 0.035;
-        const revY = (4 - i) * 12;
-        const revX = 0;
-        const revRotate = ((4 - i) % 3 - 1) * 1.5;
-
-        // timeline tweens
-        // Stacking -> Circular Fanning (duration 0.3)
-        tl.to(wrapper, {
-          x: fanX,
-          y: fanY,
-          scale: fanScale,
-          rotate: fanRotate,
-          duration: 0.3,
-          ease: "power2.inOut",
-        }, 0.15);
-
-        // Circular Fanning -> Reversed Stack (duration 0.3)
-        tl.to(wrapper, {
-          x: revX,
-          y: revY,
-          scale: revScale,
-          rotate: revRotate,
-          duration: 0.3,
-          ease: "power2.inOut",
-        }, 0.45);
-
-        // Parallax effects across the active fanning-merging range (duration 0.6)
-        if (img) {
-          tl.to(img, {
-            scale: 1.0,
-            y: 25,
-            duration: 0.6,
-            ease: "power1.inOut",
+          tl.to(wrapper, {
+            x: fanX,
+            y: fanY,
+            scale: fanScale,
+            rotate: fanRotate,
+            duration: 0.3,
+            ease: "power2.inOut",
           }, 0.15);
-        }
-        if (text) {
-          tl.to(text, {
-            y: -30,
-            duration: 0.6,
-            ease: "power1.inOut",
-          }, 0.15);
-        }
-      });
 
-      // Swapping zIndex on the parent container at exactly 0.45 progress (midpoint of fanning)
-      cardsElements.forEach((el, i) => {
-        tl.set(el, { zIndex: cardsElements.length - i }, 0);
-        tl.set(el, { zIndex: i + 1 }, 0.45);
+          tl.to(wrapper, {
+            x: revX,
+            y: revY,
+            scale: revScale,
+            rotate: revRotate,
+            duration: 0.3,
+            ease: "power2.inOut",
+          }, 0.45);
+
+          if (img) {
+            tl.to(img, {
+              scale: 1.0,
+              y: 25,
+              duration: 0.6,
+              ease: "power1.inOut",
+            }, 0.15);
+          }
+          if (text) {
+            tl.to(text, {
+              y: -30,
+              duration: 0.6,
+              ease: "power1.inOut",
+            }, 0.15);
+          }
+        });
+
+        cardsElements.forEach((el, i) => {
+          tl.set(el, { zIndex: cardsElements.length - i }, 0);
+          tl.set(el, { zIndex: i + 1 }, 0.45);
+        });
       });
     }, container);
 
-    // Refresh ScrollTrigger after a slight delay to ensure correct layout calculations
-    const refreshTimer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 150);
-
-    return () => {
-      clearTimeout(refreshTimer);
-      ctx.revert();
-    };
-  }, [windowWidth]);
+    return () => ctx.revert();
+  }, []);
 
   return (
     <main ref={mainContainerRef} className={styles.mainContainer}>

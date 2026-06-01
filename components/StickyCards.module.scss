@@ -53,9 +53,6 @@
 
   &:hover {
     .cardInner {
-      // translateY(-40px) moves the card radially outwards along its tangent axis
-      // scale(1.75) reverses the circular parent scale (0.52) back to full legibility (~0.91)
-      transform: translateY(-40px) scale(1.75) !important;
       box-shadow: 0 45px 90px rgba(0, 234, 100, 0.22), 0 0 0 2px rgba(0, 234, 100, 0.35);
       border-color: rgba(0, 234, 100, 0.55);
     }
@@ -64,7 +61,7 @@
   @media (max-width: 1024px) {
     &:hover {
       .cardInner {
-        transform: translateY(-30px) scale(1.95) !important; // Balances parent scale (0.45) on tablet
+        // Handled by GSAP
       }
     }
   }
@@ -76,7 +73,7 @@
 
     &:hover {
       .cardInner {
-        transform: translateY(-20px) scale(2.2) !important; // Balances parent scale (0.38) on mobile
+        // Handled by GSAP
       }
     }
   }
@@ -96,9 +93,9 @@
   gap: 32px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  transition: transform 0.5s cubic-bezier(0.25, 1, 0.3, 1),
-              box-shadow 0.5s cubic-bezier(0.25, 1, 0.3, 1),
+  transition: box-shadow 0.5s cubic-bezier(0.25, 1, 0.3, 1),
               border-color 0.5s cubic-bezier(0.25, 1, 0.3, 1);
+  will-change: transform, box-shadow;
 
   @media (max-width: 768px) {
     flex-direction: column;
