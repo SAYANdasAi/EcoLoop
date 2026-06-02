@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Leaf,
@@ -10,11 +10,16 @@ import {
   Layers,
   Wrench,
   CheckCircle2,
+  ShoppingBag,
 } from "lucide-react";
+import { useBasket } from "../../context/AppContext";
+import { LogoFull } from "../../components/Logo";
+import Footer from "../../components/Footer";
 import InteractiveGridBg from "../../components/InteractiveGridBg";
 import SideMenu from "../../components/SideMenu";
 import Marquee from "../../components/Marquee";
 import { FadeUp } from "../../components/animations/FadeUp";
+import { motion, AnimatePresence } from "framer-motion";
 
 const products = [
   {
@@ -83,8 +88,37 @@ const products = [
 ];
 
 export default function MarketplacePage() {
+  const { addItem, items } = useBasket();
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const handleSourceItem = (p: typeof products[0]) => {
+    addItem({
+      title: p.title,
+      price: p.price,
+      type: p.type,
+      role: p.role
+    });
+    setToastMessage(`✦ Added "${p.title}" to Basket!`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
   return (
     <div className="min-h-screen bg-transparent text-slate-100 font-sans relative overflow-x-hidden selection:bg-green-500 selection:text-slate-950">
+      {/* Dynamic Floating Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.95 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-[#161616] border border-green-500/30 text-green-400 px-6 py-3 rounded-full text-xs font-bold shadow-[0_0_30px_rgba(34,197,94,0.15)] flex items-center gap-2.5 backdrop-blur-md"
+          >
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Interactive Background */}
       <InteractiveGridBg />
 
@@ -97,21 +131,25 @@ export default function MarketplacePage() {
       {/* Minimal Header */}
       <header className="absolute top-0 inset-x-0 z-40 bg-transparent py-6 border-b border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-lg bg-green-600 flex items-center justify-center text-slate-950 transition-transform group-hover:scale-105">
-              <Leaf className="w-5 h-5 fill-slate-950 stroke-slate-950" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white group-hover:text-green-400 transition-colors">
-              EcoLoop
-            </span>
+          <Link href="/">
+            <LogoFull />
           </Link>
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Home</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard?tab=basket"
+              className="flex items-center gap-2 text-xs font-semibold text-green-400 hover:text-green-300 bg-green-500/10 border border-green-500/20 px-3.5 py-1.5 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>Basket ({items.length})</span>
+            </Link>
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-full transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Home</span>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -177,7 +215,10 @@ export default function MarketplacePage() {
                   </div>
                   <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-between">
                     <span className="font-mono text-2xl font-bold text-white">{p.price}</span>
-                    <button className={`inline-flex items-center justify-center rounded-lg ${p.btnColor} font-semibold text-xs py-2.5 px-4 transition-colors`}>
+                    <button
+                      onClick={() => handleSourceItem(p)}
+                      className={`inline-flex items-center justify-center rounded-lg ${p.btnColor} font-semibold text-xs py-2.5 px-4 transition-colors cursor-pointer`}
+                    >
                       Source Item
                     </button>
                   </div>
@@ -187,6 +228,7 @@ export default function MarketplacePage() {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

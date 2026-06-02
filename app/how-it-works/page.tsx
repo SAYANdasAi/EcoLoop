@@ -3,10 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { Leaf, ArrowLeft } from "lucide-react";
+import { LogoFull } from "../../components/Logo";
 import InteractiveGridBg from "../../components/InteractiveGridBg";
 import SideMenu from "../../components/SideMenu";
 import StickyCards from "../../components/StickyCards";
 import Marquee from "../../components/Marquee";
+import Footer from "../../components/Footer";
 import { FadeUp } from "../../components/animations/FadeUp";
 
 export default function HowItWorksPage() {
@@ -24,13 +26,8 @@ export default function HowItWorksPage() {
       {/* Minimal Header */}
       <header className="absolute top-0 inset-x-0 z-40 bg-transparent py-6 border-b border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-lg bg-green-600 flex items-center justify-center text-slate-950 transition-transform group-hover:scale-105">
-              <Leaf className="w-5 h-5 fill-slate-950 stroke-slate-950" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white group-hover:text-green-400 transition-colors">
-              EcoLoop
-            </span>
+          <Link href="/">
+            <LogoFull />
           </Link>
           <Link
             href="/"
@@ -73,6 +70,9 @@ export default function HowItWorksPage() {
         {/* Stack-on-scroll parallax section */}
         <StickyCards />
       </div>
+
+      {/* Reusable Footer */}
+      <Footer />
     </div>
   );
 }

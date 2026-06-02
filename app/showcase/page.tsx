@@ -12,10 +12,12 @@ import {
   ShieldCheck,
   CheckCircle2,
 } from "lucide-react";
+import { LogoFull } from "../../components/Logo";
 import InteractiveGridBg from "../../components/InteractiveGridBg";
 import SideMenu from "../../components/SideMenu";
 import Marquee from "../../components/Marquee";
 import { FadeUp } from "../../components/animations/FadeUp";
+import Footer from "../../components/Footer";
 
 // Scanner sub-component (blueprint check)
 interface HolographicScannerProps {
@@ -29,117 +31,266 @@ function HolographicScanner({ device, scanStep }: HolographicScannerProps) {
 
   const screenGradeColor = !isFinished
     ? scanStep === 4
-      ? "text-yellow-400 animate-pulse"
-      : "text-slate-600"
+      ? "text-yellow-400 animate-pulse pulse-target"
+      : "text-slate-600/80"
     : device === "phone"
-    ? "text-yellow-500"
+    ? "text-green-400"
     : "text-red-500";
 
   const batteryGradeColor = !isFinished
     ? scanStep === 5
-      ? "text-yellow-400 animate-pulse"
-      : "text-slate-600"
+      ? "text-yellow-400 animate-pulse pulse-target"
+      : "text-slate-600/80"
     : device === "phone"
-    ? "text-yellow-500"
+    ? "text-green-400"
     : device === "laptop"
     ? "text-yellow-500"
     : "text-red-500";
 
   const cameraGradeColor = !isFinished
     ? scanStep === 6
-      ? "text-yellow-400 animate-pulse"
-      : "text-slate-600"
+      ? "text-yellow-400 animate-pulse pulse-target"
+      : "text-slate-600/80"
     : "text-green-500";
 
   const chassisGradeColor = !isFinished
     ? scanStep === 7
-      ? "text-yellow-400 animate-pulse"
-      : "text-slate-600"
+      ? "text-yellow-400 animate-pulse pulse-target"
+      : "text-slate-600/80"
     : device === "phone"
-    ? "text-yellow-500"
+    ? "text-green-400"
     : device === "laptop"
     ? "text-yellow-500"
     : "text-red-500";
 
   return (
-    <div className="relative w-full max-w-[280px] aspect-[4/5] bg-black/60 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center overflow-hidden shadow-2xl">
+    <div className="relative w-full max-w-[280px] bg-[#09090b] border border-white/[0.07] rounded-[2rem] p-6 flex flex-col items-center justify-between overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+      
       {/* Sci-fi tech border corners */}
-      <span className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-green-500/50" />
-      <span className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-green-500/50" />
-      <span className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-green-500/50" />
-      <span className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-green-500/50" />
-      <span className="absolute top-3 left-6 font-mono text-[9px] text-white/30 uppercase select-none">
-        Appraisal Blueprint v2.0
-      </span>
+      <span className="absolute top-3 left-3 w-3 h-3 border-t border-l border-mint-glow/40" />
+      <span className="absolute top-3 right-3 w-3 h-3 border-t border-r border-mint-glow/40" />
+      <span className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-mint-glow/40" />
+      <span className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-mint-glow/40" />
+      
+      {/* Sleek top status header bar (Fixes overlap with notch) */}
+      <div className="w-full flex items-center justify-between border-b border-white/[0.04] pb-2 z-10">
+        <div className="flex gap-1.5 items-center">
+          <div className={`w-1 h-1 rounded-full ${isScanning ? "bg-amber-400 animate-pulse" : "bg-green-500 animate-ping"}`} />
+          <span className="font-mono text-[8px] text-white/30 uppercase tracking-[0.15em] select-none">AI_CORE_DIAG</span>
+        </div>
+        <span className="font-mono text-[8px] text-mint-glow font-bold uppercase tracking-wider select-none">
+          {isFinished ? "SCAN COMPLETE" : isScanning ? "ANALYSIS IN PROGRESS" : "STANDBY"}
+        </span>
+      </div>
 
-      {/* Sweeping Laser Beam */}
+      {/* Cyber Grid scanning texture overlay */}
       {isScanning && (
-        <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent shadow-[0_0_10px_rgba(74,222,128,0.8)] z-20 pointer-events-none animate-bounce" />
+        <div className="absolute inset-0 opacity-15 tech-grid pointer-events-none z-0" />
+      )}
+
+      {/* Rotating sci-fi radar/target lines in the background */}
+      {isScanning && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+          {/* Outer dashed spinning ring */}
+          <div className="absolute w-56 h-56 rounded-full border border-mint-glow/15 border-dashed animate-[spin_25s_linear_infinite]" />
+          {/* Mid solid reversing ring */}
+          <div className="absolute w-44 h-44 rounded-full border border-ai-cyan/10 border-t-transparent border-b-transparent animate-[spin_15s_linear_infinite_reverse]" />
+          {/* Inner expanding soft sonar wave */}
+          <div className="absolute w-32 h-32 rounded-full bg-mint-glow/5 border border-primary-glow/20 animate-ping opacity-60" style={{ animationDuration: "3s" }} />
+        </div>
+      )}
+
+      {/* Sweeping Laser Beam - Premium Glowing sweep bar */}
+      {isScanning && (
+        <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary-glow to-transparent shadow-[0_0_15px_#00F5A0,0_0_30px_#00E676] z-20 pointer-events-none laser-active" />
       )}
 
       {/* Device Vector Silhouette and target dots */}
-      <div className="relative w-full flex-1 flex items-center justify-center z-10 py-4">
+      <div className="relative w-full flex-1 flex items-center justify-center z-10 py-6">
         {device === "phone" && (
-          <div className="relative w-36 h-64 border-4 border-slate-700/80 rounded-[2.2rem] bg-slate-900/40 p-2 shadow-2xl flex flex-col justify-between transition-all">
-            <div className="w-16 h-4 bg-slate-800 rounded-full mx-auto" />
-            <div className="flex-1 rounded-[1.8rem] border border-slate-800 bg-slate-950/20 relative flex items-center justify-center overflow-hidden mt-1">
+          <div className="relative w-32 h-56 border-2 border-white/10 rounded-[2rem] bg-black/45 p-1.5 shadow-2xl flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:border-white/20">
+            {/* Notch */}
+            <div className="w-12 h-3.5 bg-slate-900 rounded-full mx-auto" />
+            <div className="flex-1 rounded-[1.6rem] border border-white/[0.05] bg-black/35 relative flex items-center justify-center overflow-hidden mt-1">
+              {/* Screen target */}
               <div className={`absolute top-[30%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors ${screenGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
+              {/* Battery target */}
               <div className={`absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors ${batteryGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
+              {/* Camera target */}
               <div className={`absolute top-[18%] left-[24%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors ${cameraGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
+              {/* Chassis target */}
               <div className={`absolute top-[80%] left-[30%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors ${chassisGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
             </div>
           </div>
         )}
 
         {device === "laptop" && (
-          <div className="relative w-52 h-44 flex flex-col justify-end">
-            <div className="w-[180px] h-[110px] border-4 border-slate-700/80 rounded-t-xl bg-slate-900/40 mx-auto relative p-1.5 flex items-center justify-center shadow-xl">
-              <div className="flex-1 h-full rounded-t border border-slate-800 bg-slate-950/20 relative">
+          <div className="relative w-48 h-40 flex flex-col justify-end transition-all duration-300 hover:scale-[1.02]">
+            {/* Screen lid */}
+            <div className="w-[160px] h-[95px] border-2 border-white/10 rounded-t-lg bg-black/45 mx-auto relative p-1 flex items-center justify-center shadow-xl">
+              <div className="flex-1 h-full rounded border border-white/[0.05] bg-black/35 relative">
+                {/* Screen target */}
                 <div className={`absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors ${screenGradeColor}`}>
-                  <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                  <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
                 </div>
               </div>
             </div>
-            <div className="w-full h-4 border-2 border-slate-700/80 bg-slate-800 rounded-t relative">
-              <div className="w-20 h-1 bg-slate-950 rounded-b mx-auto" />
-              <div className={`absolute top-[-30px] left-[20%] cursor-pointer z-10 transition-colors ${batteryGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+            {/* Lower deck */}
+            <div className="w-full h-3 border-2 border-white/10 bg-slate-900/60 rounded-t relative">
+              <div className="w-16 h-0.5 bg-black rounded-b mx-auto" />
+              {/* Battery target */}
+              <div className={`absolute top-[-26px] left-[20%] cursor-pointer z-10 transition-colors ${batteryGradeColor}`}>
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
-              <div className={`absolute top-[-30px] right-[20%] cursor-pointer z-10 transition-colors ${chassisGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+              {/* Motherboard target */}
+              <div className={`absolute top-[-26px] right-[20%] cursor-pointer z-10 transition-colors ${chassisGradeColor}`}>
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
             </div>
           </div>
         )}
 
         {device === "tablet" && (
-          <div className="relative w-44 h-56 border-4 border-slate-700/80 rounded-[1.5rem] bg-slate-900/40 p-2 shadow-2xl flex flex-col justify-between transition-all">
-            <div className="flex-1 rounded-[1.2rem] border border-slate-800 bg-slate-950/20 relative flex items-center justify-center overflow-hidden">
+          <div className="relative w-40 h-48 border-2 border-white/10 rounded-[1.2rem] bg-black/45 p-1.5 shadow-2xl flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:border-white/20">
+            <div className="flex-1 rounded-[0.9rem] border border-white/[0.05] bg-black/35 relative flex items-center justify-center overflow-hidden">
+              {/* Screen target */}
               <div className={`absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors ${screenGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
+              {/* Battery target */}
               <div className={`absolute top-[75%] left-[50%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors ${batteryGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
+              {/* Motherboard target */}
               <div className={`absolute top-[18%] left-[25%] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-colors ${chassisGradeColor}`}>
-                <span className="block w-4 h-4 rounded-full border-2 border-current bg-black" />
+                <span className="block w-3.5 h-3.5 rounded-full border-2 border-current bg-black" />
               </div>
             </div>
           </div>
         )}
       </div>
 
-      <div className="w-full mt-2 pt-2 border-t border-white/5 flex justify-between font-mono text-[9px] text-white/40">
-        <span>STATUS: {isFinished ? "LOCKED" : isScanning ? "SCANNING" : "STANDBY"}</span>
-        <span>SYS_TEMP: 34.2°C</span>
+      {/* Structured Tactical HUD Status Grid (Prevents cramped overlap text) */}
+      <div className="w-full mt-2 pt-3.5 border-t border-white/[0.05] grid grid-cols-2 gap-2 z-10 font-mono text-[9px]">
+        {device === "phone" && (
+          <>
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 flex flex-col transition-all ${scanStep >= 4 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 4 ? "bg-amber-400 animate-pulse" : scanStep > 4 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">SCR (Screen)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "Grade B (Scratched)" : isScanning && scanStep === 4 ? "SCANNING..." : "WAITING"}
+              </span>
+            </div>
+
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 flex flex-col transition-all ${scanStep >= 5 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 5 ? "bg-amber-400 animate-pulse" : scanStep > 5 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">BAT (Battery)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "82% Capacity" : isScanning && scanStep === 5 ? "ANALYZING..." : "WAITING"}
+              </span>
+            </div>
+
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 flex flex-col transition-all ${scanStep >= 6 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 6 ? "bg-amber-400 animate-pulse" : scanStep > 6 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">CAM (Camera)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "Grade A (Mint)" : isScanning && scanStep === 6 ? "CHECKING..." : "WAITING"}
+              </span>
+            </div>
+
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 flex flex-col transition-all ${scanStep >= 7 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 7 ? "bg-amber-400 animate-pulse" : scanStep > 7 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">CHA (Chassis)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "Grade B (Scuffed)" : isScanning && scanStep === 7 ? "INSPECTING..." : "WAITING"}
+              </span>
+            </div>
+          </>
+        )}
+
+        {device === "laptop" && (
+          <>
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 flex flex-col transition-all ${scanStep >= 4 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 4 ? "bg-amber-400 animate-pulse" : scanStep > 4 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">SCR (Screen)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "Grade C (Delam)" : isScanning && scanStep === 4 ? "SCANNING..." : "WAITING"}
+              </span>
+            </div>
+
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 flex flex-col transition-all ${scanStep >= 5 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 5 ? "bg-amber-400 animate-pulse" : scanStep > 5 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">BAT (Battery)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "76% Capacity" : isScanning && scanStep === 5 ? "ANALYZING..." : "WAITING"}
+              </span>
+            </div>
+
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 col-span-2 flex flex-col transition-all ${scanStep >= 7 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 7 ? "bg-amber-400 animate-pulse" : scanStep > 7 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">MB (Motherboard)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "Func 100% (Passed)" : isScanning && scanStep === 7 ? "INSPECTING..." : "WAITING"}
+              </span>
+            </div>
+          </>
+        )}
+
+        {device === "tablet" && (
+          <>
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 flex flex-col transition-all ${scanStep >= 4 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 4 ? "bg-amber-400 animate-pulse" : scanStep > 4 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">SCR (Screen)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "Grade D (Shattered)" : isScanning && scanStep === 4 ? "SCANNING..." : "WAITING"}
+              </span>
+            </div>
+
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 flex flex-col transition-all ${scanStep >= 5 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 5 ? "bg-amber-400 animate-pulse" : scanStep > 5 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">BAT (Battery)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "Swollen (Critical)" : isScanning && scanStep === 5 ? "ANALYZING..." : "WAITING"}
+              </span>
+            </div>
+
+            <div className={`p-1.5 rounded-lg border bg-[#050505]/40 col-span-2 flex flex-col transition-all ${scanStep >= 7 ? "border-mint-glow/20 text-white" : "border-white/[0.03] text-white/30"}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${scanStep === 7 ? "bg-amber-400 animate-pulse" : scanStep > 7 ? "bg-mint-glow shadow-[0_0_6px_rgba(0,230,118,0.8)]" : "bg-slate-600"}`} />
+                <span className="font-bold tracking-wider">CHA (Chassis)</span>
+              </div>
+              <span className="mt-1 font-semibold text-[8px] truncate">
+                {isFinished ? "Grade D (Bent Frame)" : isScanning && scanStep === 7 ? "INSPECTING..." : "WAITING"}
+              </span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -188,24 +339,71 @@ export default function ShowcasePage() {
   const [selectedDevice, setSelectedDevice] = useState<"phone" | "laptop" | "tablet">("phone");
   const [scanStep, setScanStep] = useState(0);
   const [typedLogs, setTypedLogs] = useState<string[]>([]);
+  const [aiResult, setAiResult] = useState<any>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
+  // Trigger Gemini AI Diagnostics call when selectedDevice changes
   useEffect(() => {
-    // Reset simulator
+    let active = true;
     setScanStep(0);
-    setTypedLogs([]);
+    setTypedLogs([
+      "Initializing EcoLoop diagnostic engine...",
+      "Contacting Gemini AI cognitive services... [PENDING]"
+    ]);
+    setAiResult(null);
+    setIsAiLoading(true);
+
+    const fetchDiagnostics = async () => {
+      try {
+        const res = await fetch("/api/diagnose", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ device: selectedDevice })
+        });
+        const data = await res.json();
+        if (active) {
+          setAiResult(data);
+          setIsAiLoading(false);
+        }
+      } catch (err) {
+        console.error("Showcase Diagnostics fetch error:", err);
+        if (active) {
+          setIsAiLoading(false);
+        }
+      }
+    };
+
+    // Delay slightly to show standard high-tech connection handshake logs first
+    const delayTimer = setTimeout(() => {
+      fetchDiagnostics();
+    }, 800);
+
+    return () => {
+      active = false;
+      clearTimeout(delayTimer);
+    };
+  }, [selectedDevice]);
+
+  // Typing simulator based on aiResult availability
+  useEffect(() => {
+    if (!aiResult) return;
 
     const logs = [
       "Initializing EcoLoop diagnostic engine...",
-      `Scanning hardware profile for: ${deviceSpecs[selectedDevice].name}`,
-      "Analyzing optical inputs & micro-cracks...",
-      `Screen assessment: ${deviceSpecs[selectedDevice].diagnostics.screen}`,
-      `Power state validation: ${deviceSpecs[selectedDevice].diagnostics.battery}`,
-      `Component integrity logs parsed successfully.`,
-      "Running multi-outcome neural classifier...",
-      `Optimal outcome locked: ${deviceSpecs[selectedDevice].outcome}`,
+      "Cognitive diagnostics link: CONNECTED via Gemini AI [OK].",
+      `Target hardware profile identified: ${aiResult.name}`,
+      `Screen glass check: ${aiResult.diagnostics.screen}`,
+      `Power state validation: ${aiResult.diagnostics.battery}`,
+      `Camera sensor diagnostics: ${aiResult.diagnostics.camera}`,
+      `Chassis structural check: ${aiResult.diagnostics.chassis}`,
+      `Circular routing locked: [${aiResult.outcome.toUpperCase()}]`,
+      `Diagnostics audit report successfully certified.`
     ];
 
-    let logIndex = 0;
+    setTypedLogs([logs[0], logs[1]]);
+    setScanStep(2);
+
+    let logIndex = 2;
     const interval = setInterval(() => {
       if (logIndex < logs.length) {
         setTypedLogs((prev) => [...prev, logs[logIndex]]);
@@ -214,10 +412,10 @@ export default function ShowcasePage() {
       } else {
         clearInterval(interval);
       }
-    }, 850);
+    }, 950);
 
     return () => clearInterval(interval);
-  }, [selectedDevice]);
+  }, [aiResult]);
 
   return (
     <div className="min-h-screen bg-transparent text-slate-100 font-sans relative overflow-x-hidden selection:bg-green-500 selection:text-slate-950">
@@ -233,13 +431,8 @@ export default function ShowcasePage() {
       {/* Minimal Header */}
       <header className="absolute top-0 inset-x-0 z-40 bg-transparent py-6 border-b border-white/[0.03]">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-lg bg-green-600 flex items-center justify-center text-slate-950 transition-transform group-hover:scale-105">
-              <Leaf className="w-5 h-5 fill-slate-950 stroke-slate-950" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white group-hover:text-green-400 transition-colors">
-              EcoLoop
-            </span>
+          <Link href="/">
+            <LogoFull />
           </Link>
           <Link
             href="/"
@@ -364,14 +557,14 @@ export default function ShowcasePage() {
                   <div className="flex flex-col justify-between pl-2">
                     <div>
                       <div className="font-mono text-[9px] font-semibold text-white/40 mb-1">CLASSIFICATION</div>
-                      {scanStep >= 8 ? (
+                      {scanStep >= 8 && aiResult ? (
                         <motion.div
                           initial={{ scale: 0.9, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           className="inline-flex items-center gap-1.5 rounded-lg bg-green-600/10 border border-green-600/30 px-2.5 py-1 text-xs font-bold text-green-400 shadow-[0_0_15px_rgba(74,222,128,0.1)]"
                         >
                           <ShieldCheck className="w-3.5 h-3.5" />
-                          {deviceSpecs[selectedDevice].outcome}
+                          {aiResult.outcome}
                         </motion.div>
                       ) : (
                         <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-2.5 py-1 text-xs font-bold text-white/50 animate-pulse">
@@ -382,7 +575,7 @@ export default function ShowcasePage() {
 
                     <div className="space-y-3 font-ui mt-4">
                       {["refurbish", "resale", "salvage", "recycle"].map((type) => {
-                        const pct = scanStep >= 8 ? deviceSpecs[selectedDevice].confidences[type as keyof typeof deviceSpecs[typeof selectedDevice]["confidences"]] : 0;
+                        const pct = (scanStep >= 8 && aiResult) ? (aiResult.confidences[type] || 0) : 0;
                         const labelMap = {
                           refurbish: "Refurbish",
                           resale: "P2P Resale",
@@ -419,6 +612,7 @@ export default function ShowcasePage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

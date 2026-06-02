@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  Leaf, 
+  User,
   Mail, 
   Eye, 
   EyeOff, 
@@ -17,17 +17,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AppContext";
 import { LogoFull } from "../../../components/Logo";
-
-// ==========================================
-// CUSTOM ICONS
-// ==========================================
-
-const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-    <path d="M9 18c-4.51 2-5-2-7-2" />
-  </svg>
-);
 
 // ==========================================
 // SUB-COMPONENTS
@@ -102,47 +91,62 @@ const InputField = ({
   </div>
 );
 
+const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
+
 // ==========================================
 // MAIN PAGE
 // ==========================================
 
-export default function LoginPage() {
-  const { login } = useAuth();
+export default function SignupPage() {
+  const { signup, login } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
+    if (!name) newErrors.name = "Name is required";
+    
     if (!email) newErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = "Invalid email address";
     
     if (!password) newErrors.password = "Password is required";
     else if (password.length < 6) newErrors.password = "Password must be at least 6 characters";
     
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsLoading(true);
     try {
-      await login(email);
+      await signup(name, email);
       router.push("/dashboard");
     } catch (err) {
-      setErrors({ email: "Authentication failed. Please try again." });
+      setErrors({ email: "Registration failed. Please try again." });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'github') => {
+  const handleSocialSignUp = async (provider: 'google' | 'github') => {
     setIsLoading(true);
     try {
       await login(`${provider.toLowerCase()}@ecoloop.ai`, provider === 'google' ? "Google User" : "GitHub User");
@@ -185,9 +189,9 @@ export default function LoginPage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-5xl font-extrabold text-white leading-[1.1] mb-6"
           >
-            Every device <br />
-            <span className="text-green-500">deserves</span> a <br />
-            second life.
+            Create an <span className="text-green-500">impact</span>. <br />
+            Join the circular <br />
+            revolution.
           </motion.h1>
           
           <div className="flex flex-col gap-4 mt-12">
@@ -210,10 +214,10 @@ export default function LoginPage() {
       </div>
 
       {/* RIGHT PANEL - FORM */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-white relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-white relative overflow-y-auto">
         
         {/* Mobile Logo */}
-        <div className="lg:hidden absolute top-8 left-8">
+        <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
           <LogoFull />
         </div>
 
@@ -221,16 +225,16 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
+          className="w-full max-w-md my-12"
         >
           <div className="mb-8">
-            <h2 className="text-3xl font-black text-slate-900 mb-2">Welcome back</h2>
-            <p className="text-slate-500 font-medium">Sign in to your EcoLoop account</p>
+            <h2 className="text-3xl font-black text-slate-900 mb-2">Join EcoLoop</h2>
+            <p className="text-slate-500 font-medium">Start recycling and trading circular electronics</p>
           </div>
 
           <div className="space-y-4 mb-8">
             <button
-              onClick={() => handleSocialLogin('google')}
+              onClick={() => handleSocialSignUp('google')}
               className="w-full h-11 flex items-center justify-center gap-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all font-bold text-slate-700 text-sm"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -239,14 +243,14 @@ export default function LoginPage() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              Continue with Google
+              Sign up with Google
             </button>
             <button
-              onClick={() => handleSocialLogin('github')}
+              onClick={() => handleSocialSignUp('github')}
               className="w-full h-11 flex items-center justify-center gap-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all font-bold text-slate-700 text-sm"
             >
               <GithubIcon className="w-5 h-5 text-slate-900" />
-              Continue with GitHub
+              Sign up with GitHub
             </button>
           </div>
 
@@ -255,11 +259,21 @@ export default function LoginPage() {
               <div className="w-full border-t border-slate-100"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
-              <span className="bg-white px-4 text-slate-400">or continue with email</span>
+              <span className="bg-white px-4 text-slate-400">or register with email</span>
             </div>
           </div>
 
-          <form onSubmit={handleSignIn} className="space-y-5">
+          <form onSubmit={handleSignUp} className="space-y-4">
+            <InputField
+              label="Full Name"
+              type="text"
+              placeholder="Your Name"
+              icon={User}
+              value={name}
+              onChange={(e: any) => setName(e.target.value)}
+              error={errors.name}
+            />
+
             <InputField
               label="Email Address"
               type="email"
@@ -270,35 +284,38 @@ export default function LoginPage() {
               error={errors.email}
             />
 
-            <div className="relative">
-              <InputField
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                icon={ShieldCheck}
-                value={password}
-                onChange={(e: any) => setPassword(e.target.value)}
-                error={errors.password}
-                showPasswordToggle
-                onTogglePassword={() => setShowPassword(!showPassword)}
-              />
-              <div className="flex justify-end mt-1.5">
-                <Link href="/auth/forgot" className="text-[11px] font-bold text-green-600 hover:text-green-500 transition-colors">
-                  Forgot password?
-                </Link>
-              </div>
-            </div>
+            <InputField
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              icon={ShieldCheck}
+              value={password}
+              onChange={(e: any) => setPassword(e.target.value)}
+              error={errors.password}
+              showPasswordToggle
+              onTogglePassword={() => setShowPassword(!showPassword)}
+            />
+
+            <InputField
+              label="Confirm Password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              icon={ShieldCheck}
+              value={confirmPassword}
+              onChange={(e: any) => setConfirmPassword(e.target.value)}
+              error={errors.confirmPassword}
+            />
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 bg-green-600 hover:bg-green-500 disabled:bg-green-400 text-white rounded-xl font-bold shadow-lg shadow-green-200 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98]"
+              className="w-full h-12 mt-6 bg-green-600 hover:bg-green-500 disabled:bg-green-400 text-white rounded-xl font-bold shadow-lg shadow-green-200 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98]"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Sign In
+                  Register
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -306,9 +323,9 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-8 text-center text-sm font-semibold text-slate-500">
-            Don&apos;t have an account?{" "}
-            <Link href="/auth/signup" className="text-green-600 hover:text-green-500 transition-colors">
-              Sign up &rarr;
+            Already have an account?{" "}
+            <Link href="/auth/login" className="text-green-600 hover:text-green-500 transition-colors">
+              Sign in &rarr;
             </Link>
           </p>
         </motion.div>

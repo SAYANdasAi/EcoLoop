@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useAuth, useBasket } from "../context/AppContext";
 import styles from "./SideMenu.module.scss";
 
 interface NavLinkItem {
@@ -27,6 +28,44 @@ const SOCIAL_LINKS = [
 
 export default function SideMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const { items } = useBasket();
+
+  const activeLinks = [
+    { label: "Home", href: "/" },
+    { label: "How It Works", href: "/how-it-works" },
+    { label: "Features", href: "/features" },
+    { label: "AI Diagnostics", href: "/showcase" },
+    { label: "Marketplace", href: "/marketplace" },
+    ...(isAuthenticated 
+      ? [
+          { label: "Dashboard", href: "/dashboard" },
+          { label: `Basket (${items.length})`, href: "/dashboard?tab=basket" }
+        ]
+      : [
+          { label: "Sign In", href: "/auth/login" }
+        ]
+    )
+  ];
+
+  // Magnetic Button Logic
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set((e.clientX - centerX) * 0.4);
+    y.set((e.clientY - centerY) * 0.4);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   const toggleMenu = () => setIsOpen((prev) => !prev);
   const closeMenu = () => setIsOpen(false);
@@ -114,8 +153,11 @@ export default function SideMenu() {
   return (
     <>
       {/* Toggle Button */}
-      <button
+      <motion.button
         onClick={toggleMenu}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ x: mouseXSpring, y: mouseYSpring }}
         className={`${styles.menuBtn} ${isOpen ? styles.menuActive : ""}`}
         aria-label="Toggle menu"
       >
@@ -150,7 +192,7 @@ export default function SideMenu() {
             className="w-full h-0.5 rounded-full"
           />
         </div>
-      </button>
+      </motion.button>
 
       {/* Backdrop */}
       <AnimatePresence>
@@ -179,7 +221,7 @@ export default function SideMenu() {
             <div className={styles.navBody}>
               <span className={styles.footerLabel}>Navigation</span>
               <div className={styles.perspectiveParent}>
-                {NAV_LINKS.map((link, i) => (
+                {activeLinks.map((link, i) => (
                   <div key={link.label} className={styles.linkContainer}>
                     <motion.div
                       custom={i}

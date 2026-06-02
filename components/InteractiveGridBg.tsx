@@ -11,6 +11,16 @@ interface Node {
   vy: number;
 }
 
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  alpha: number;
+  life: number;
+}
+
 interface Ripple {
   x: number;
   y: number;
@@ -24,6 +34,7 @@ export default function InteractiveGridBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const ripplesRef = useRef<Ripple[]>([]);
+  const particlesRef = useRef<Particle[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -36,11 +47,27 @@ export default function InteractiveGridBg() {
     let height = (canvas.height = window.innerHeight);
     let isAnimating = false;
 
-    // Grid spacing configuration - increased for better performance
+    // Grid spacing configuration
     const spacing = 120;
     let nodes: Node[] = [];
 
-    // Initialize nodes at grid intersections
+    // Initialize particles
+    const initParticles = () => {
+      particlesRef.current = [];
+      const count = 30;
+      for (let i = 0; i < count; i++) {
+        particlesRef.current.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: Math.random() * 2 + 1,
+          alpha: Math.random() * 0.5,
+          life: Math.random() * 0.5 + 0.5,
+        });
+      }
+    };
+
     const initNodes = () => {
       nodes = [];
       const cols = Math.ceil(width / spacing) + 1;
@@ -63,6 +90,7 @@ export default function InteractiveGridBg() {
     };
 
     initNodes();
+    initParticles();
 
     // Start/resume render loop
     const startAnimating = () => {
@@ -72,7 +100,7 @@ export default function InteractiveGridBg() {
       }
     };
 
-    // Mouse movement listener (global window to capture over other components)
+    // Mouse movement listener
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current.x = e.clientX;
       mouseRef.current.y = e.clientY;
@@ -82,10 +110,8 @@ export default function InteractiveGridBg() {
 
     const handleMouseLeave = () => {
       mouseRef.current.active = false;
-      startAnimating();
     };
 
-    // Click trigger for energy shockwaves
     const handleWindowClick = (e: MouseEvent) => {
       ripplesRef.current.push({
         x: e.clientX,
@@ -110,24 +136,6 @@ export default function InteractiveGridBg() {
     window.addEventListener("click", handleWindowClick);
     window.addEventListener("resize", handleResize);
 
-    // Check if any node is still moving significantly
-    const checkNodeStability = () => {
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        const dxBase = node.baseX - node.x;
-        const dyBase = node.baseY - node.y;
-        if (
-          Math.abs(node.vx) > 0.01 || 
-          Math.abs(node.vy) > 0.01 || 
-          Math.abs(dxBase) > 0.1 || 
-          Math.abs(dyBase) > 0.1
-        ) {
-          return false;
-        }
-      }
-      return true;
-    };
-
     // Frame render loop
     const render = () => {
       ctx.clearRect(0, 0, width, height);
@@ -138,7 +146,39 @@ export default function InteractiveGridBg() {
 
       const mouse = mouseRef.current;
       const ripples = ripplesRef.current;
-      let needsSubsequentFrame = false;
+      const particles = particlesRef.current;
+      let needsSubsequentFrame = true; // Particles always need animation
+
+      // Update and draw particles
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Gravity towards mouse
+        if (mouse.active) {
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 400) {
+            const force = (400 - dist) / 400;
+            p.vx += (dx / dist) * force * 0.02;
+            p.vy += (dy / dist) * force * 0.02;
+          }
+        }
+
+        // Friction and bounds
+        p.vx *= 0.99;
+        p.vy *= 0.99;
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 234, 100, ${p.alpha})`;
+        ctx.fill();
+      });
 
       // Update ripples
       for (let i = ripples.length - 1; i >= 0; i--) {
@@ -147,8 +187,6 @@ export default function InteractiveGridBg() {
         r.alpha -= 0.015;
         if (r.alpha <= 0 || r.radius >= r.maxRadius) {
           ripples.splice(i, 1);
-        } else {
-          needsSubsequentFrame = true;
         }
       }
 
@@ -165,181 +203,109 @@ export default function InteractiveGridBg() {
           const dyMouse = mouse.y - node.y;
           const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
           
-          if (distMouse < 180) {
-            const force = (180 - distMouse) / 180;
+          if (distMouse < 250) {
+            const force = (250 - distMouse) / 250;
             const angle = Math.atan2(dyMouse, dxMouse);
-            const pullForce = force * 6;
+            const pullForce = force * 8;
             node.vx += Math.cos(angle) * pullForce;
             node.vy += Math.sin(angle) * pullForce;
-            // If mouse is active and close, we likely need another frame
-            needsSubsequentFrame = true;
           }
         }
 
-        node.vx *= 0.82;
-        node.vy *= 0.82;
+        node.vx *= 0.85;
+        node.vy *= 0.85;
         node.x += node.vx;
         node.y += node.vy;
       });
 
-      // If we haven't already decided to animate, check all nodes for stability
-      if (!needsSubsequentFrame && !checkNodeStability()) {
-        needsSubsequentFrame = true;
-      }
-
-      // Draw Grid Lines with dynamic alpha offsets near mouse/ripples
+      // Draw Grid Lines
       const cols = Math.ceil(width / spacing) + 1;
       const rows = Math.ceil(height / spacing) + 1;
 
-      // Draw base vertical lines
+      // Global Spotlight mask
+      if (mouse.active) {
+        const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 600);
+        gradient.addColorStop(0, "rgba(0, 234, 100, 0.15)");
+        gradient.addColorStop(0.5, "rgba(0, 234, 100, 0.05)");
+        gradient.addColorStop(1, "rgba(0, 234, 100, 0)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      }
+
       ctx.beginPath();
       for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
           const idx = c * rows + r;
           if (idx >= nodes.length) continue;
           const node = nodes[idx];
-
-          if (r === 0) {
-            ctx.moveTo(node.x, node.y);
-          } else {
-            ctx.lineTo(node.x, node.y);
-          }
+          if (r === 0) ctx.moveTo(node.x, node.y);
+          else ctx.lineTo(node.x, node.y);
         }
       }
-      ctx.strokeStyle = "rgba(0, 234, 100, 0.075)"; // brand green base grid lines
-      ctx.lineWidth = 0.8;
+      ctx.strokeStyle = "rgba(0, 234, 100, 0.05)";
       ctx.stroke();
 
-      // Draw base horizontal lines
       ctx.beginPath();
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const idx = c * rows + r;
           if (idx >= nodes.length) continue;
           const node = nodes[idx];
-
-          if (c === 0) {
-            ctx.moveTo(node.x, node.y);
-          } else {
-            ctx.lineTo(node.x, node.y);
-          }
+          if (c === 0) ctx.moveTo(node.x, node.y);
+          else ctx.lineTo(node.x, node.y);
         }
       }
-      ctx.strokeStyle = "rgba(0, 234, 100, 0.075)";
-      ctx.lineWidth = 0.8;
+      ctx.strokeStyle = "rgba(0, 234, 100, 0.05)";
       ctx.stroke();
 
-      // Highlight line segments dynamically near mouse or ripples
+      // Dynamic connection highlights
       nodes.forEach((node, idx) => {
         let highlightAlpha = 0;
-
-        // Proximity check
         if (mouse.active) {
           const dx = mouse.x - node.x;
           const dy = mouse.y - node.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 180) {
-            highlightAlpha += (180 - dist) / 180 * 0.15;
-          }
+          if (dist < 200) highlightAlpha += (200 - dist) / 200 * 0.2;
         }
 
-        // Ripple check
         ripples.forEach((rip) => {
           const dx = rip.x - node.x;
           const dy = rip.y - node.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           const ringWidth = 80;
           if (Math.abs(dist - rip.radius) < ringWidth) {
-            const ringFactor = 1 - Math.abs(dist - rip.radius) / ringWidth;
-            highlightAlpha += ringFactor * rip.alpha * 0.4;
+            highlightAlpha += (1 - Math.abs(dist - rip.radius) / ringWidth) * rip.alpha * 0.4;
           }
         });
 
-        // Draw glowing line to right and bottom neighbors if alpha > 0
         if (highlightAlpha > 0.01) {
           const c = Math.floor(idx / rows);
           const r = idx % rows;
-
-          // Draw right connection
           if (c < cols - 1) {
-            const rightIdx = (c + 1) * rows + r;
-            if (rightIdx < nodes.length) {
-              const rightNode = nodes[rightIdx];
+            const rightNode = nodes[(c + 1) * rows + r];
+            if (rightNode) {
               ctx.beginPath();
               ctx.moveTo(node.x, node.y);
               ctx.lineTo(rightNode.x, rightNode.y);
               ctx.strokeStyle = `rgba(0, 234, 100, ${highlightAlpha})`;
-              ctx.lineWidth = 1.0;
               ctx.stroke();
             }
           }
-
-          // Draw bottom connection
           if (r < rows - 1) {
-            const bottomIdx = c * rows + (r + 1);
-            if (bottomIdx < nodes.length) {
-              const bottomNode = nodes[bottomIdx];
+            const bottomNode = nodes[idx + 1];
+            if (bottomNode) {
               ctx.beginPath();
               ctx.moveTo(node.x, node.y);
               ctx.lineTo(bottomNode.x, bottomNode.y);
               ctx.strokeStyle = `rgba(0, 234, 100, ${highlightAlpha})`;
-              ctx.lineWidth = 1.0;
               ctx.stroke();
             }
           }
-        }
-      });
-
-      // Render glowing nodes (only draw when hovered or rippled for performance)
-      nodes.forEach((node) => {
-        let alpha = 0.01;
-        let isGlow = false;
-
-        // Proximity glow
-        if (mouse.active) {
-          const dx = mouse.x - node.x;
-          const dy = mouse.y - node.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 150) {
-            alpha += (150 - dist) / 150 * 0.35;
-            isGlow = true;
-          }
-        }
-
-        // Ripple shockwave intersection glow
-        ripples.forEach((rip) => {
-          const dx = rip.x - node.x;
-          const dy = rip.y - node.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          
-          // Width of the pulse ring
-          const ringWidth = 80;
-          if (Math.abs(dist - rip.radius) < ringWidth) {
-            const ringFactor = 1 - Math.abs(dist - rip.radius) / ringWidth;
-            alpha += ringFactor * rip.alpha * 0.8;
-            isGlow = true;
-          }
-        });
-
-        if (isGlow && alpha > 0.01) {
-          // Draw outer glow circle
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, 4, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0, 234, 100, ${alpha})`;
-          ctx.fill();
-
-          // Draw small bright center core
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, 1.2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1, alpha * 1.8)})`;
-          ctx.fill();
         }
       });
 
       if (needsSubsequentFrame) {
         animationFrameId = requestAnimationFrame(render);
-      } else {
-        isAnimating = false;
       }
     };
 
