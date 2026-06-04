@@ -23,9 +23,7 @@ export default function RootLayout({
       className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-[#080808] text-slate-100">
-        <Providers>
-          {children}
-        </Providers>
+        {children}
       </body>
     </html>
   );
