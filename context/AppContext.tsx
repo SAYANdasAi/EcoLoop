@@ -203,7 +203,8 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
     const result = await nextAuthSignIn("credentials", {
       email,
       password: "password123", // simulated password satisfying credentials check
-      redirect: false
+      callbackUrl: "/dashboard",
+      redirect: true
     });
 
     if (result?.error) {
@@ -236,7 +237,8 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
     const result = await nextAuthSignIn("credentials", {
       email,
       password: "password123",
-      redirect: false
+      callbackUrl: "/dashboard",
+      redirect: true
     });
 
     if (result?.error) {

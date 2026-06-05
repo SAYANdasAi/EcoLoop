@@ -146,6 +146,7 @@ export default function SubmitDevicePage() {
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [apiResult, setApiResult] = useState<any>(null);
 
   const {
     register,
@@ -200,13 +201,65 @@ export default function SubmitDevicePage() {
   const goNext = () => { setDirection(1); setStep((p) => (p + 1) as 1 | 2 | 3); };
   const goPrev = () => { setDirection(-1); setStep((p) => (p - 1) as 1 | 2 | 3); };
 
-  const onSubmitForm = (data: FormData) => {
-    console.log("Submitting form data:", data);
+  const onSubmitForm = async (data: FormData) => {
+    console.log("Submitting form data to Gemini API:", data);
     setDirection(1);
     setStep(3);
     setIsAnalyzing(true);
     setShowResult(false);
-    setTimeout(() => { setIsAnalyzing(false); setShowResult(true); }, 2000);
+
+    try {
+      const response = await fetch("/api/diagnose", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API returned status: ${response.status}`);
+      }
+
+      const resultData = await response.json();
+      
+      // Map API outcome to proper styling classes
+      const outcome = resultData.outcome;
+      let badgeCls = "";
+      let cardCls = "";
+      let barCls = "";
+
+      if (outcome === "Recycle") {
+        badgeCls = "bg-red-600/20 border border-red-500/30 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.15)]";
+        cardCls = "border-red-500/30 bg-red-950/20";
+        barCls = "bg-red-500";
+      } else if (outcome === "Repair") {
+        badgeCls = "bg-amber-500/20 border border-amber-500/30 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.15)]";
+        cardCls = "border-amber-500/30 bg-amber-950/20";
+        barCls = "bg-amber-500";
+      } else if (outcome === "Refurbish") {
+        badgeCls = "bg-blue-600/20 border border-blue-500/30 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]";
+        cardCls = "border-blue-500/30 bg-blue-950/20";
+        barCls = "bg-blue-500";
+      } else { // Reuse
+        badgeCls = "bg-green-600/20 border border-green-500/30 text-green-400 shadow-[0_0_15px_rgba(74,222,128,0.15)]";
+        cardCls = "border-green-500/30 bg-green-950/20";
+        barCls = "bg-green-500";
+      }
+
+      setApiResult({
+        ...resultData,
+        badgeCls,
+        cardCls,
+        barCls,
+      });
+    } catch (error) {
+      console.error("Gemini AI API call failed, using heuristic fallback:", error);
+      setApiResult(null); // Fallback to getResult()
+    } finally {
+      setIsAnalyzing(false);
+      setShowResult(true);
+    }
   };
 
   // AI classification logic matching cyberpunk dark styles
@@ -261,7 +314,7 @@ export default function SubmitDevicePage() {
     };
   };
 
-  const result = getResult();
+  const result = apiResult || getResult();
 
   const stepVariants = {
     enter: (dir: number) => ({ opacity: 0, x: dir * 48 }),
@@ -779,7 +832,7 @@ export default function SubmitDevicePage() {
                         {/* Restart */}
                         <div className="text-center">
                           <button
-                            onClick={() => { setDirection(-1); setStep(1); setImages({}); setShowResult(false); }}
+                            onClick={() => { setDirection(-1); setStep(1); setImages({}); setShowResult(false); setApiResult(null); }}
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-white/40 hover:text-green-400 transition-colors"
                           >
                             <RefreshCw className="w-3.5 h-3.5" />

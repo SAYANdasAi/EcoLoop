@@ -17,6 +17,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AppContext";
 import { LogoFull } from "../../../components/Logo";
+import { signIn } from "next-auth/react";
+
 
 // ==========================================
 // SUB-COMPONENTS
@@ -137,11 +139,13 @@ export default function SignupPage() {
 
     setIsLoading(true);
     try {
-      await signup(name, email);
-      router.push("/dashboard");
+      const success = await signup(name, email);
+      if (!success) {
+        setErrors({ email: "Registration failed. Please try again." });
+        setIsLoading(false);
+      }
     } catch (err) {
       setErrors({ email: "Registration failed. Please try again." });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -149,11 +153,9 @@ export default function SignupPage() {
   const handleSocialSignUp = async (provider: 'google' | 'github') => {
     setIsLoading(true);
     try {
-      await login(`${provider.toLowerCase()}@ecoloop.ai`, provider === 'google' ? "Google User" : "GitHub User");
-      router.push("/dashboard");
+      await signIn(provider, { callbackUrl: "/dashboard" });
     } catch (err) {
       console.error(err);
-    } finally {
       setIsLoading(false);
     }
   };

@@ -17,6 +17,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AppContext";
 import { LogoFull } from "../../../components/Logo";
+import { signIn } from "next-auth/react";
+
 
 // ==========================================
 // CUSTOM ICONS
@@ -133,11 +135,13 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      await login(email);
-      router.push("/dashboard");
+      const success = await login(email);
+      if (!success) {
+        setErrors({ email: "Authentication failed. Please try again." });
+        setIsLoading(false);
+      }
     } catch (err) {
       setErrors({ email: "Authentication failed. Please try again." });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -145,11 +149,9 @@ export default function LoginPage() {
   const handleSocialLogin = async (provider: 'google' | 'github') => {
     setIsLoading(true);
     try {
-      await login(`${provider.toLowerCase()}@ecoloop.ai`, provider === 'google' ? "Google User" : "GitHub User");
-      router.push("/dashboard");
+      await signIn(provider, { callbackUrl: "/dashboard" });
     } catch (err) {
       console.error(err);
-    } finally {
       setIsLoading(false);
     }
   };
