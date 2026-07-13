@@ -456,7 +456,8 @@ async function queryPricingAndClassification(
   let logStr = "";
 
   try {
-    const res = await fetch("http://localhost:8010/combined", {
+    const priceServiceUrl = process.env.NEXT_PUBLIC_PRICE_SERVICE_URL || "http://localhost:8010";
+    const res = await fetch(`${priceServiceUrl}/combined`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(pricePayload)
@@ -471,11 +472,12 @@ async function queryPricingAndClassification(
       logStr += `[Pricing] XGBoost: $${xgboostUSD.toFixed(2)}, Groq Agent: $${agentPriceUSD.toFixed(2)}. `;
     }
   } catch (err) {
-    console.error("Failed to connect to mobile_price_service at port 8010:", err);
+    console.error("Failed to connect to mobile_price_service:", err);
   }
 
   try {
-    const res = await fetch("http://localhost:8020/combined", {
+    const classifierServiceUrl = process.env.NEXT_PUBLIC_CLASSIFIER_SERVICE_URL || "http://localhost:8020";
+    const res = await fetch(`${classifierServiceUrl}/combined`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(classifierPayload)
@@ -487,7 +489,7 @@ async function queryPricingAndClassification(
       logStr += `[Classification] Price range category: ${priceClassCode} (${priceClassLabel}).`;
     }
   } catch (err) {
-    console.error("Failed to connect to mobile_classifier_service at port 8020:", err);
+    console.error("Failed to connect to mobile_classifier_service:", err);
   }
 
   const lowerOutcome = outcome.trim().toLowerCase();
