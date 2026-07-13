@@ -24,6 +24,16 @@ export interface UserProfile {
   devicesAppraisedCount: number;
   devicesList: AppraisedDevice[];
   avatarUrl?: string;
+  role: "buyer" | "seller";
+  plan: "free" | "pro" | "smart";
+  wishlist: string[];
+  bankDetails?: {
+    accountHolder: string;
+    bankName: string;
+    accountNum: string;
+    ifsc: string;
+  };
+  listedProducts: any[];
 }
 
 export interface BasketItem {
@@ -39,11 +49,17 @@ interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, name?: string) => Promise<boolean>;
-  signup: (name: string, email: string) => Promise<boolean>;
+  login: (email: string, password?: string, role?: "buyer" | "seller") => Promise<boolean>;
+  signup: (name: string, email: string, password?: string, role?: "buyer" | "seller") => Promise<boolean>;
   logout: () => void;
   updateProfile: (name: string, email: string) => void;
   addAppraisedDevice: (device: Omit<AppraisedDevice, "id" | "date">) => void;
+  toggleWishlist: (productId: string) => void;
+  upgradePlan: (plan: "free" | "pro" | "smart") => void;
+  updateBankDetails: (bankDetails: { accountHolder: string; bankName: string; accountNum: string; ifsc: string }) => void;
+  listProduct: (product: any) => void;
+  chatMessages: { [chatId: string]: any[] };
+  sendMessage: (sender: string, receiver: string, text: string) => void;
 }
 
 interface BasketContextType {
@@ -62,41 +78,6 @@ interface BasketContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const BasketContext = createContext<BasketContextType | undefined>(undefined);
 
-// Default initial user data
-const DEFAULT_USER: UserProfile = {
-  name: "Sayan Das",
-  email: "sayan@ecoloop.ai",
-  payouts: 850.00,
-  carbonAverted: 420.5,
-  devicesAppraisedCount: 3,
-  avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop",
-  devicesList: [
-    {
-      id: "EL-9821",
-      name: "iPhone 13 Pro",
-      status: "Refurbished",
-      grade: "Grade B",
-      payout: 340.00,
-      date: "2026-05-18",
-    },
-    {
-      id: "EL-4482",
-      name: "MacBook Air M1",
-      status: "Harvested",
-      grade: "Grade C",
-      payout: 510.00,
-      date: "2026-05-25",
-    },
-    {
-      id: "EL-1093",
-      name: "iPad Pro 11-inch",
-      status: "Recycled",
-      grade: "Grade D",
-      payout: 0.00,
-      date: "2026-05-30",
-    }
-  ]
-};
 
 // ==========================================
 // 3. COMBINED PROVIDER COMPONENT
@@ -118,32 +99,64 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
 
     if (status === "authenticated" && session?.user) {
       const email = session.user.email || "";
-      const existingData = localStorage.getItem(`ecoloop_user_${email}`);
+      setAuthLoading(true);
 
-      let loggedInUser: UserProfile;
-      if (existingData) {
-        loggedInUser = JSON.parse(existingData);
-      } else {
-        // Fallback to default user if they log in with the exact default email
-        if (email === "sayan@ecoloop.ai") {
-          loggedInUser = DEFAULT_USER;
-        } else {
-          loggedInUser = {
-            name: session.user.name || email.split("@")[0].replace(/[._]/g, " "),
-            email: email,
-            payouts: 0.00,
-            carbonAverted: 0.0,
-            devicesAppraisedCount: 0,
-            devicesList: [],
-            avatarUrl: session.user.image || `https://api.dicebear.com/7.x/bottts/svg?seed=${email}`
-          };
-        }
-        localStorage.setItem(`ecoloop_user_${email}`, JSON.stringify(loggedInUser));
-      }
+      // Fetch user profile from Neon DB via API
+      fetch(`/api/user/profile?email=${encodeURIComponent(email)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) {
+            const pendingRole = typeof window !== "undefined" ? localStorage.getItem("ecoloop_oauth_role") : null;
+            if (pendingRole && (pendingRole === "buyer" || pendingRole === "seller") && data.role !== pendingRole) {
+              // Sync role selection from social login to DB
+              fetch("/api/user/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: data.email, role: pendingRole })
+              })
+              .then(() => {
+                setUser({ ...data, role: pendingRole as "buyer" | "seller" });
+                setIsAuthenticated(true);
+                if (typeof window !== "undefined") {
+                  localStorage.removeItem("ecoloop_oauth_role");
+                }
+              })
+              .catch((err) => {
+                console.error("Error updating profile role:", err);
+                setUser(data);
+                setIsAuthenticated(true);
+              });
+            } else {
+              setUser(data);
+              setIsAuthenticated(true);
+              if (typeof window !== "undefined") {
+                localStorage.removeItem("ecoloop_oauth_role");
+              }
+            }
+          } else {
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+          setAuthLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching user profile:", err);
+          setUser(null);
+          setIsAuthenticated(false);
+          setAuthLoading(false);
+        });
 
-      setUser(loggedInUser);
-      setIsAuthenticated(true);
-      setAuthLoading(false);
+      // Fetch chats from Neon DB via API
+      fetch(`/api/chats?email=${encodeURIComponent(email)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.chats) {
+            setChatMessages(data.chats);
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching chats:", err);
+        });
     } else {
       setUser(null);
       setIsAuthenticated(false);
@@ -165,9 +178,6 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
   const saveUser = (newUser: UserProfile | null, authState: boolean) => {
     setUser(newUser);
     setIsAuthenticated(authState);
-    if (typeof window !== "undefined" && newUser) {
-      localStorage.setItem(`ecoloop_user_${newUser.email}`, JSON.stringify(newUser));
-    }
   };
 
   const saveBasket = (newItems: BasketItem[]) => {
@@ -181,28 +191,14 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
   // AUTH ROUTINES
   // ==========================================
 
-  const login = async (email: string, name?: string): Promise<boolean> => {
+  const login = async (email: string, password?: string, role?: "buyer" | "seller"): Promise<boolean> => {
     setAuthLoading(true);
-
-    // Check if registry record exists, if not initialize it
-    const existingData = localStorage.getItem(`ecoloop_user_${email}`);
-    if (!existingData) {
-      const initialUser: UserProfile = {
-        name: name || email.split("@")[0].replace(/[._]/g, " "),
-        email: email,
-        payouts: 0.00,
-        carbonAverted: 0.0,
-        devicesAppraisedCount: 0,
-        devicesList: [],
-        avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${email}`
-      };
-      localStorage.setItem(`ecoloop_user_${email}`, JSON.stringify(initialUser));
-    }
 
     // Call NextAuth signIn credentials provider
     const result = await nextAuthSignIn("credentials", {
       email,
-      password: "password123", // simulated password satisfying credentials check
+      password: password || "password123", // simulated password satisfying credentials check or custom password
+      role: role || "buyer",
       callbackUrl: "/dashboard",
       redirect: true
     });
@@ -215,78 +211,224 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
     return true;
   };
 
-  const signup = async (name: string, email: string): Promise<boolean> => {
+  const signup = async (name: string, email: string, password?: string, role?: "buyer" | "seller"): Promise<boolean> => {
     setAuthLoading(true);
 
-    const newUser: UserProfile = {
-      name,
-      email,
-      payouts: 0.00,
-      carbonAverted: 0.0,
-      devicesAppraisedCount: 0,
-      devicesList: [],
-      avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${email}`
-    };
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password: password || "password123", role: role || "buyer" })
+      });
+      const data = await res.json();
+      if (data.error) {
+        setAuthLoading(false);
+        return false;
+      }
 
-    // Save in general registry before logging in
-    if (typeof window !== "undefined") {
-      localStorage.setItem(`ecoloop_user_${email}`, JSON.stringify(newUser));
-    }
+      // Sign in the user instantly with NextAuth
+      const result = await nextAuthSignIn("credentials", {
+        email,
+        password: password || "password123",
+        callbackUrl: "/dashboard",
+        redirect: true
+      });
 
-    // Sign in the user instantly with NextAuth
-    const result = await nextAuthSignIn("credentials", {
-      email,
-      password: "password123",
-      callbackUrl: "/dashboard",
-      redirect: true
-    });
+      if (result?.error) {
+        setAuthLoading(false);
+        return false;
+      }
 
-    if (result?.error) {
+      return true;
+    } catch (err) {
+      console.error("Signup API error:", err);
       setAuthLoading(false);
       return false;
     }
+  };
 
-    return true;
+  // ==========================================
+  // CHAT MESSAGES STATE
+  // ==========================================
+  const [chatMessages, setChatMessages] = useState<{ [chatId: string]: any[] }>({});
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedChats = localStorage.getItem("ecoloop_chats");
+      if (storedChats) {
+        setChatMessages(JSON.parse(storedChats));
+      }
+    }
+  }, []);
+
+  const saveChats = (newChats: { [chatId: string]: any[] }) => {
+    setChatMessages(newChats);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("ecoloop_chats", JSON.stringify(newChats));
+    }
+  };
+
+  const toggleWishlist = async (productId: string) => {
+    if (!user) return;
+    try {
+      const res = await fetch("/api/user/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, productId })
+      });
+      const data = await res.json();
+      if (data.success && data.wishlist) {
+        setUser({ ...user, wishlist: data.wishlist });
+      }
+    } catch (err) {
+      console.error("Wishlist API error:", err);
+    }
+  };
+
+  const upgradePlan = async (plan: "free" | "pro" | "smart") => {
+    if (!user) return;
+    try {
+      const res = await fetch("/api/user/plan", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, plan })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUser({ ...user, plan });
+      }
+    } catch (err) {
+      console.error("Plan upgrade API error:", err);
+    }
+  };
+
+  const updateBankDetails = async (bankDetails: { accountHolder: string; bankName: string; accountNum: string; ifsc: string }) => {
+    if (!user) return;
+    try {
+      const res = await fetch("/api/user/bank", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, bankDetails })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUser({ ...user, bankDetails });
+      }
+    } catch (err) {
+      console.error("Bank details API error:", err);
+    }
+  };
+
+  const listProduct = async (product: any) => {
+    if (!user) return;
+    try {
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: product.title,
+          price: product.price,
+          type: product.type,
+          role: product.role,
+          specs: product.specs,
+          image: product.image,
+          sellerEmail: user.email,
+          sellerName: user.name
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.productId) {
+        const newProduct = {
+          ...product,
+          id: data.productId,
+          sellerEmail: user.email,
+          sellerName: user.name,
+          date: new Date().toISOString().split("T")[0]
+        };
+        const listedProducts = user.listedProducts || [];
+        setUser({ ...user, listedProducts: [newProduct, ...listedProducts] });
+      }
+    } catch (err) {
+      console.error("List product API error:", err);
+    }
+  };
+
+  const sendMessage = async (sender: string, receiver: string, text: string) => {
+    try {
+      const res = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender, receiver, text })
+      });
+      const data = await res.json();
+      if (data.success && data.messageId) {
+        const chatId = [sender, receiver].sort().join("_");
+        const existing = chatMessages[chatId] || [];
+        const newMessage = {
+          id: data.messageId,
+          sender,
+          receiver,
+          text,
+          timestamp: data.timestamp
+        };
+        setChatMessages({ ...chatMessages, [chatId]: [...existing, newMessage] });
+      }
+    } catch (err) {
+      console.error("Send message API error:", err);
+    }
   };
 
   const logout = async () => {
-    if (user && typeof window !== "undefined") {
-      localStorage.setItem(`ecoloop_user_${user.email}`, JSON.stringify(user));
-    }
     await nextAuthSignOut({ redirect: false });
   };
 
-  const updateProfile = (name: string, email: string) => {
+  const updateProfile = async (name: string, email: string) => {
     if (!user) return;
-    const updatedUser = { ...user, name, email };
-    saveUser(updatedUser, isAuthenticated);
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, name })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUser({ ...user, name });
+      }
+    } catch (err) {
+      console.error("Update profile API error:", err);
+    }
   };
 
-  const addAppraisedDevice = (device: Omit<AppraisedDevice, "id" | "date">) => {
+  const addAppraisedDevice = async (device: Omit<AppraisedDevice, "id" | "date">) => {
     if (!user) return;
-    const trackingId = `EL-${Math.floor(1000 + Math.random() * 9000)}`;
-    const today = new Date().toISOString().split("T")[0];
+    try {
+      const res = await fetch("/api/user/devices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, device })
+      });
+      const data = await res.json();
+      if (data.success && data.trackingId) {
+        const newDevice: AppraisedDevice = {
+          ...device,
+          id: data.trackingId,
+          date: new Date().toISOString().split("T")[0]
+        };
+        const updatedList = [newDevice, ...user.devicesList];
+        const newPayouts = user.payouts + device.payout;
+        const newCarbon = user.carbonAverted + (device.payout > 0 ? 140.2 : 45.6);
 
-    const newDevice: AppraisedDevice = {
-      ...device,
-      id: trackingId,
-      date: today
-    };
-
-    const updatedList = [newDevice, ...user.devicesList];
-    const newPayouts = user.payouts + device.payout;
-    // Each processed device saves on average 140kg CO2 circular carbon equivalent
-    const newCarbon = user.carbonAverted + (device.payout > 0 ? 140.2 : 45.6);
-
-    const updatedUser: UserProfile = {
-      ...user,
-      devicesList: updatedList,
-      devicesAppraisedCount: updatedList.length,
-      payouts: parseFloat(newPayouts.toFixed(2)),
-      carbonAverted: parseFloat(newCarbon.toFixed(2))
-    };
-
-    saveUser(updatedUser, isAuthenticated);
+        setUser({
+          ...user,
+          devicesList: updatedList,
+          devicesAppraisedCount: updatedList.length,
+          payouts: parseFloat(newPayouts.toFixed(2)),
+          carbonAverted: parseFloat(newCarbon.toFixed(2))
+        });
+      }
+    } catch (err) {
+      console.error("Appraise device API error:", err);
+    }
   };
 
   // ==========================================
@@ -348,7 +490,13 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
         signup,
         logout,
         updateProfile,
-        addAppraisedDevice
+        addAppraisedDevice,
+        toggleWishlist,
+        upgradePlan,
+        updateBankDetails,
+        listProduct,
+        chatMessages,
+        sendMessage
       }}
     >
       <BasketContext.Provider

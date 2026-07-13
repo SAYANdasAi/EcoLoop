@@ -263,6 +263,13 @@ interface HolographicScannerProps {
 }
 
 function DataStream() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   const characters = "0123456789ABCDEF";
   return (
     <div className="absolute inset-0 flex justify-around opacity-[0.05] md:opacity-[0.08] pointer-events-none overflow-hidden">
@@ -1265,8 +1272,8 @@ function ScrollLink({ href, children, className = "", onClick }: ScrollLinkProps
                      }}
                     className="absolute w-1.5 h-1.5 bg-green-400 rounded-full"
                     style={{
-                      left: `${30 + Math.random() * 40}%`,
-                      top: `${30 + Math.random() * 40}%`,
+                      left: `${30 + (i * 7) % 41}%`,
+                      top: `${30 + (i * 13) % 41}%`,
                     }}
                   />
                 ))}

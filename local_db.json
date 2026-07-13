@@ -1,0 +1,177 @@
+{
+  "users": [
+    {
+      "id": "rita-example-com-9973",
+      "name": "Rita Vas",
+      "email": "rita@example.com",
+      "password": "password123",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=rita@example.com",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "test-example-com-1127",
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "password123",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=test@example.com",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "test-id",
+      "name": "Scratch User",
+      "email": "user-1781515675269@test.com",
+      "password": "secret123",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "avatar-url",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "test-id",
+      "name": "Scratch User",
+      "email": "user-1781515944560@test.com",
+      "password": "secret123",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "avatar-url",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "testuser-1781518354757-example-com-9439",
+      "name": "Test User custom pass",
+      "email": "testuser-1781518354757@example.com",
+      "password": "superSecret12345",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=testuser-1781518354757@example.com",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "ritavasjana661-gmail-com-5500",
+      "name": "Ritavas Jana",
+      "email": "ritavasjana661@gmail.com",
+      "password": "https://lh3.googleusercontent.com/a/ACg8ocJBlyrWKRKSAc1S6fxBiZk6n7da4SDZceujaLb0hiTuhTYH2J7T=s96-c",
+      "role": "buyer",
+      "plan": "smart",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "testrole-1781521640931-example-com-3587",
+      "name": "Role Sync Test User",
+      "email": "testrole-1781521640931@example.com",
+      "password": "password123",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=testrole-1781521640931@example.com",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "testrole-1781521659655-example-com-5834",
+      "name": "Role Sync Test User",
+      "email": "testrole-1781521659655@example.com",
+      "password": "password123",
+      "role": "seller",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=testrole-1781521659655@example.com",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "testrole-1783402936033-example-com-5197",
+      "name": "Role Sync Test User",
+      "email": "testrole-1783402936033@example.com",
+      "password": "password123",
+      "role": "seller",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=testrole-1783402936033@example.com",
+      "bank_details": null,
+      "wishlist": []
+    }
+  ],
+  "devices": [],
+  "messages": [
+    {
+      "id": "msg-1783915822680",
+      "chat_id": "hub@ecoloop.ai_ritavasjana661@gmail.com",
+      "sender": "ritavasjana661@gmail.com",
+      "receiver": "hub@ecoloop.ai",
+      "text": "hi",
+      "timestamp": "09:40 AM",
+      "created_at": "2026-07-13T04:10:22.689Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod-1",
+      "title": "iPhone 13 Pro (Refurbished)",
+      "price": "₹45,000",
+      "type": "phone",
+      "role": "sell",
+      "specs": [
+        "128GB",
+        "Sierra Blue",
+        "Battery 88%"
+      ],
+      "image": "https://images.unsplash.com/photo-1632624000450-957236014361?q=80&w=400",
+      "seller_email": "system@ecoloop.in",
+      "seller_name": "EcoLoop Official",
+      "date": "2026-06-15",
+      "created_at": "2026-06-15T09:26:19.932Z"
+    },
+    {
+      "id": "prod-2",
+      "title": "MacBook Air M1 (Fair)",
+      "price": "₹38,000",
+      "type": "laptop",
+      "role": "sell",
+      "specs": [
+        "256GB",
+        "Space Gray",
+        "Battery 76%"
+      ],
+      "image": "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=400",
+      "seller_email": "system@ecoloop.in",
+      "seller_name": "EcoLoop Official",
+      "date": "2026-06-15",
+      "created_at": "2026-06-15T09:26:19.932Z"
+    }
+  ]
+}

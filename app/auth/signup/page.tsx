@@ -11,7 +11,8 @@ import {
   ArrowRight,
   ShieldCheck,
   Cpu,
-  BarChart3
+  BarChart3,
+  ShoppingBag
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -113,6 +114,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<"buyer" | "seller">("buyer");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -139,10 +141,12 @@ export default function SignupPage() {
 
     setIsLoading(true);
     try {
-      const success = await signup(name, email);
+      const success = await signup(name, email, password, role);
       if (!success) {
         setErrors({ email: "Registration failed. Please try again." });
         setIsLoading(false);
+      } else {
+        router.push("/dashboard");
       }
     } catch (err) {
       setErrors({ email: "Registration failed. Please try again." });
@@ -153,6 +157,9 @@ export default function SignupPage() {
   const handleSocialSignUp = async (provider: 'google' | 'github') => {
     setIsLoading(true);
     try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("ecoloop_oauth_role", role);
+      }
       await signIn(provider, { callbackUrl: "/dashboard" });
     } catch (err) {
       console.error(err);
@@ -266,6 +273,38 @@ export default function SignupPage() {
           </div>
 
           <form onSubmit={handleSignUp} className="space-y-4">
+            <div className="space-y-1.5 w-full">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
+                I want to register as a:
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole("buyer")}
+                  className={`h-11 rounded-xl font-bold text-xs border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    role === "buyer"
+                      ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-600/10"
+                      : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Buyer Persona
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("seller")}
+                  className={`h-11 rounded-xl font-bold text-xs border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    role === "seller"
+                      ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-600/10"
+                      : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <Cpu className="w-4 h-4" />
+                  Seller Persona
+                </button>
+              </div>
+            </div>
+
             <InputField
               label="Full Name"
               type="text"

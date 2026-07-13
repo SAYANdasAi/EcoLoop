@@ -141,12 +141,14 @@ export default function SubmitDevicePage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [direction, setDirection] = useState<number>(1);
   const [images, setImages] = useState<Record<string, string>>({});
+  const [imageFiles, setImageFiles] = useState<Record<string, File>>({});
   const imagesRef = useRef(images);
   useEffect(() => { imagesRef.current = images; }, [images]);
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [apiResult, setApiResult] = useState<any>(null);
+  const [validationWarning, setValidationWarning] = useState<string | null>(null);
 
   const {
     register,
@@ -185,11 +187,13 @@ export default function SubmitDevicePage() {
     const url = URL.createObjectURL(file);
     if (images[slotId]) URL.revokeObjectURL(images[slotId]);
     setImages((prev) => ({ ...prev, [slotId]: url }));
+    setImageFiles((prev) => ({ ...prev, [slotId]: file }));
   };
 
   const removeImage = (slotId: string) => {
     if (images[slotId]) URL.revokeObjectURL(images[slotId]);
     setImages((prev) => { const next = { ...prev }; delete next[slotId]; return next; });
+    setImageFiles((prev) => { const next = { ...prev }; delete next[slotId]; return next; });
   };
 
   useEffect(() => {
@@ -202,22 +206,45 @@ export default function SubmitDevicePage() {
   const goPrev = () => { setDirection(-1); setStep((p) => (p - 1) as 1 | 2 | 3); };
 
   const onSubmitForm = async (data: FormData) => {
-    console.log("Submitting form data to Gemini API:", data);
+    console.log("Submitting form data to API:", data);
+    setValidationWarning(null); // Clear previous warnings
     setDirection(1);
     setStep(3);
     setIsAnalyzing(true);
     setShowResult(false);
 
     try {
+      const formDataToSend = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => formDataToSend.append(key, v));
+        } else {
+          formDataToSend.append(key, String(value));
+        }
+      });
+
+      Object.entries(imageFiles).forEach(([slotId, file]) => {
+        const fileExtension = file.name.split(".").pop() || "jpg";
+        const renamedFile = new File([file], `${slotId}.${fileExtension}`, { type: file.type });
+        formDataToSend.append("images", renamedFile);
+      });
+
       const response = await fetch("/api/diagnose", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: formDataToSend,
       });
 
       if (!response.ok) {
+        if (response.status === 400) {
+          const errData = await response.json().catch(() => ({}));
+          if (errData.error === "invalid_images") {
+            setValidationWarning(errData.message || "One or more uploaded images do not appear to be a mobile phone.");
+            setIsAnalyzing(false);
+            setDirection(-1);
+            setStep(1); // Return to upload step
+            return;
+          }
+        }
         throw new Error(`API returned status: ${response.status}`);
       }
 
@@ -418,6 +445,16 @@ export default function SubmitDevicePage() {
                         High-quality photos guarantee superior AI appraisal accuracy. Upload at least 4 clear angles.
                       </p>
                     </div>
+
+                    {validationWarning && (
+                      <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold flex items-start gap-2.5 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                        <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-bold text-red-300">Invalid Upload Detected</p>
+                          <p className="mt-0.5 text-white/70 leading-relaxed font-body">{validationWarning}</p>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-7">
                       {UPLOAD_SLOTS.map((slot) => (
