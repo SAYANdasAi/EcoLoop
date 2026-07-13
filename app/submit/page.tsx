@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/AppContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -138,6 +140,11 @@ function DropzoneBox({ slot, preview, onUpload, onRemove }: DropzoneBoxProps) {
 // ==========================================
 
 export default function SubmitDevicePage() {
+  const router = useRouter();
+  const { user, isAuthenticated, listProduct, addAppraisedDevice } = useAuth();
+  const [isListing, setIsListing] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [direction, setDirection] = useState<number>(1);
   const [images, setImages] = useState<Record<string, string>>({});
@@ -149,6 +156,68 @@ export default function SubmitDevicePage() {
   const [showResult, setShowResult] = useState(false);
   const [apiResult, setApiResult] = useState<any>(null);
   const [validationWarning, setValidationWarning] = useState<string | null>(null);
+
+  const handleListOnMarketplace = async () => {
+    if (!isAuthenticated) {
+      router.push("/auth/login");
+      return;
+    }
+    if (!apiResult) return;
+    setIsListing(true);
+    try {
+      const conditionLabel = `Screen: ${screenCondition}, Body: ${bodyCondition}`;
+      await listProduct({
+        title: `${brand} ${modelName} (${watch("storage")})`,
+        price: apiResult.value,
+        type: "device",
+        role: "seller",
+        specs: [
+          `Condition: ${conditionLabel}`,
+          `Battery: ${batteryHealth}%`,
+          `Issues: ${functionalIssues.join(", ") || "None"}`
+        ],
+        image: Object.values(images)[0] || ""
+      });
+      router.push("/marketplace");
+    } catch (e) {
+      console.error("Listing on marketplace failed:", e);
+    } finally {
+      setIsListing(false);
+    }
+  };
+
+  const handleSchedulePickup = async () => {
+    if (!isAuthenticated) {
+      router.push("/auth/login");
+      return;
+    }
+    if (!apiResult) return;
+    setIsScheduling(true);
+    try {
+      const outcome = apiResult.outcome;
+      const lower = outcome.toLowerCase();
+      let status: "Refurbished" | "Harvested" | "Recycled" | "Resale" = "Refurbished";
+      if (lower.includes("recycle")) status = "Recycled";
+      else if (lower.includes("repair")) status = "Harvested";
+      else if (lower.includes("refurbish")) status = "Refurbished";
+      else if (lower.includes("reuse")) status = "Resale";
+
+      const payoutStr = apiResult.value.replace(/[^0-9]/g, "");
+      const payout = parseFloat(payoutStr) || 0;
+
+      await addAppraisedDevice({
+        name: `${brand} ${modelName}`,
+        status,
+        grade: outcome,
+        payout
+      });
+      router.push("/dashboard");
+    } catch (e) {
+      console.error("Scheduling pickup failed:", e);
+    } finally {
+      setIsScheduling(false);
+    }
+  };
 
   const {
     register,
@@ -856,13 +925,29 @@ export default function SubmitDevicePage() {
 
                         {/* CTAs */}
                         <div className="flex flex-col sm:flex-row gap-3 mb-5">
-                          <button className="flex-1 inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-green-600 hover:bg-green-500 text-slate-950 font-bold shadow-lg shadow-green-950/40 hover:scale-[1.01] active:scale-[0.98] transition-all">
-                            <Coins className="w-5 h-5" />
-                            List on Marketplace
+                          <button
+                            onClick={handleListOnMarketplace}
+                            disabled={isListing || isScheduling}
+                            className="flex-1 inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-green-600 hover:bg-green-500 text-slate-950 font-bold shadow-lg shadow-green-950/40 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
+                          >
+                            {isListing ? (
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                              <Coins className="w-5 h-5" />
+                            )}
+                            {isListing ? "Listing..." : "List on Marketplace"}
                           </button>
-                          <button className="flex-1 inline-flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-white/10 hover:border-green-500 hover:bg-green-950/10 text-white/80 font-bold transition-all">
-                            <ShieldCheck className="w-5 h-5 text-green-400" />
-                            Schedule Pickup
+                          <button
+                            onClick={handleSchedulePickup}
+                            disabled={isListing || isScheduling}
+                            className="flex-1 inline-flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-white/10 hover:border-green-500 hover:bg-green-950/10 text-white/80 font-bold transition-all disabled:opacity-50"
+                          >
+                            {isScheduling ? (
+                              <Loader2 className="w-5 h-5 animate-spin text-green-400" />
+                            ) : (
+                              <ShieldCheck className="w-5 h-5 text-green-400" />
+                            )}
+                            {isScheduling ? "Scheduling..." : "Schedule Pickup"}
                           </button>
                         </div>
 
