@@ -174,7 +174,7 @@ export default function SubmitDevicePage() {
         specs: [
           `Condition: ${conditionLabel}`,
           `Battery: ${batteryHealth}%`,
-          `Issues: ${functionalIssues.join(", ") || "None"}`
+          `Issues: ${(functionalIssues || []).join(", ") || "None"}`
         ],
         image: Object.values(images)[0] || ""
       });
