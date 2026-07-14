@@ -172,6 +172,57 @@
       "seller_name": "EcoLoop Official",
       "date": "2026-06-15",
       "created_at": "2026-06-15T09:26:19.932Z"
+    },
+    {
+      "id": "prod-8138",
+      "title": "Samsung M52 (128GB)",
+      "price": "₹3,625",
+      "type": "device",
+      "role": "seller",
+      "specs": [
+        "Condition: Screen: minor_scratches, Body: fair",
+        "Battery: 74%",
+        "Issues: battery_drain, button_fault"
+      ],
+      "image": "blob:http://localhost:3000/20504d2b-0bb5-40d6-84cf-60f0f7b1296b",
+      "seller_email": "ritavasjana661@gmail.com",
+      "seller_name": "Ritavas Jana",
+      "date": "2026-07-14",
+      "created_at": "2026-07-14T16:10:40.774Z"
+    },
+    {
+      "id": "prod-2851",
+      "title": "Samsung M52 (128GB)",
+      "price": "₹3,625",
+      "type": "device",
+      "role": "seller",
+      "specs": [
+        "Condition: Screen: minor_scratches, Body: fair",
+        "Battery: 74%",
+        "Issues: battery_drain, button_fault"
+      ],
+      "image": "blob:http://localhost:3000/20504d2b-0bb5-40d6-84cf-60f0f7b1296b",
+      "seller_email": "ritavasjana661@gmail.com",
+      "seller_name": "Ritavas Jana",
+      "date": "2026-07-14",
+      "created_at": "2026-07-14T16:10:41.530Z"
+    },
+    {
+      "id": "prod-8200",
+      "title": "Samsung M52 (128GB)",
+      "price": "₹3,625",
+      "type": "device",
+      "role": "seller",
+      "specs": [
+        "Condition: Screen: minor_scratches, Body: fair",
+        "Battery: 74%",
+        "Issues: battery_drain, button_fault"
+      ],
+      "image": "blob:http://localhost:3000/20504d2b-0bb5-40d6-84cf-60f0f7b1296b",
+      "seller_email": "ritavasjana661@gmail.com",
+      "seller_name": "Ritavas Jana",
+      "date": "2026-07-14",
+      "created_at": "2026-07-14T16:10:41.686Z"
     }
   ]
 }
