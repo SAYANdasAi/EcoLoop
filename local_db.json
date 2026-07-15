@@ -124,6 +124,32 @@
       "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=testrole-1783402936033@example.com",
       "bank_details": null,
       "wishlist": []
+    },
+    {
+      "id": "ritavasjana111-gmail-com-8841",
+      "name": "Ritavas Jana",
+      "email": "ritavasjana111@gmail.com",
+      "password": "https://lh3.googleusercontent.com/a/ACg8ocKdbGZiVfIIvJjpP-Pzm54yMlBXQlTwQbc0RxXyMz23ab3uQbhA=s96-c",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "janaritavas-gmail-com-2067",
+      "name": "Ritavas Jana",
+      "email": "janaritavas@gmail.com",
+      "password": "https://lh3.googleusercontent.com/a/ACg8ocJxckOY8bIS4FcRH3ngn3dmMM2UazSvjy4WGKY1egWir2Ku-va9=s96-c",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "bank_details": null,
+      "wishlist": []
     }
   ],
   "devices": [],

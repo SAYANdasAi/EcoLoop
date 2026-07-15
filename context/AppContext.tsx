@@ -120,11 +120,13 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
                 if (typeof window !== "undefined") {
                   localStorage.removeItem("ecoloop_oauth_role");
                 }
+                setAuthLoading(false);
               })
               .catch((err) => {
                 console.error("Error updating profile role:", err);
                 setUser(data);
                 setIsAuthenticated(true);
+                setAuthLoading(false);
               });
             } else {
               setUser(data);
@@ -132,12 +134,13 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
               if (typeof window !== "undefined") {
                 localStorage.removeItem("ecoloop_oauth_role");
               }
+              setAuthLoading(false);
             }
           } else {
             setUser(null);
             setIsAuthenticated(false);
+            setAuthLoading(false);
           }
-          setAuthLoading(false);
         })
         .catch((err) => {
           console.error("Error fetching user profile:", err);
