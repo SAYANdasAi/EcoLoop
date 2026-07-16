@@ -203,7 +203,7 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
       password: password || "password123", // simulated password satisfying credentials check or custom password
       role: role || "buyer",
       callbackUrl: "/dashboard",
-      redirect: true
+      redirect: false
     });
 
     if (result?.error) {
@@ -234,7 +234,7 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
         email,
         password: password || "password123",
         callbackUrl: "/dashboard",
-        redirect: true
+        redirect: false
       });
 
       if (result?.error) {

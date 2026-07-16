@@ -150,6 +150,48 @@
       "devices_appraised_count": 0,
       "bank_details": null,
       "wishlist": []
+    },
+    {
+      "id": "testrole-1784170833681-example-com-4368",
+      "name": "Role Sync Test User",
+      "email": "testrole-1784170833681@example.com",
+      "password": "password123",
+      "role": "seller",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=testrole-1784170833681@example.com",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "browser-test-example-com-1745",
+      "name": "Browser Test",
+      "email": "browser-test@example.com",
+      "password": "password123",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=browser-test@example.com",
+      "bank_details": null,
+      "wishlist": []
+    },
+    {
+      "id": "test-login-user2-example-com-4877",
+      "name": "Test Login User",
+      "email": "test-login-user2@example.com",
+      "password": "password123",
+      "role": "buyer",
+      "plan": "free",
+      "payouts": 0,
+      "carbon_averted": 0,
+      "devices_appraised_count": 0,
+      "avatar_url": "https://api.dicebear.com/7.x/bottts/svg?seed=test-login-user2@example.com",
+      "bank_details": null,
+      "wishlist": []
     }
   ],
   "devices": [],

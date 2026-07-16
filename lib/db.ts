@@ -96,14 +96,26 @@ function localQuery(queryText: string, params: any[] = []): any {
 
   // 5. INSERT INTO users
   if (normalizedQuery.match(/INSERT INTO users/i)) {
-    // values array contains [id, name, email, password, role, avatar_url, wishlist]
-    const id = params[0];
-    const name = params[1];
-    const email = params[2];
-    const password = params[3];
-    const role = params[4];
-    const avatar_url = params[5];
-    const wishlistStr = params[6];
+    let id, name, email, password, role, avatar_url, wishlistStr;
+    if (params.length === 5) {
+      // OAuth register insert from nextauth route
+      id = params[0];
+      name = params[1];
+      email = params[2];
+      password = 'oauth_provider_no_password';
+      role = 'buyer';
+      avatar_url = params[3];
+      wishlistStr = params[4];
+    } else {
+      // Standard register insert
+      id = params[0];
+      name = params[1];
+      email = params[2];
+      password = params[3];
+      role = params[4];
+      avatar_url = params[5];
+      wishlistStr = params[6];
+    }
     
     const newUser = {
       id,

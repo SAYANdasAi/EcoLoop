@@ -74,7 +74,7 @@ const InputField = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full h-11 pl-10 pr-10 bg-slate-50 border rounded-xl text-sm transition-all outline-none 
+        className={`w-full h-11 pl-10 pr-10 bg-slate-50 border rounded-xl text-sm text-black transition-all outline-none 
           ${error 
             ? 'border-red-200 focus:border-red-400 focus:ring-4 ring-red-500/10' 
             : 'border-slate-200 focus:border-green-500 focus:ring-4 ring-green-500/10'
@@ -205,12 +205,8 @@ export default function SignupPage() {
           
           <div className="flex flex-col gap-4 mt-12">
             <StatPill icon={ShieldCheck} text="♻️ 12,400 devices recovered" delay={0.2} />
-            <div className="ml-8">
-              <StatPill icon={Cpu} text="🧠 AI-graded in seconds" delay={0.4} />
-            </div>
-            <div className="ml-4">
-              <StatPill icon={BarChart3} text="📦 Real-time tracking" delay={0.6} />
-            </div>
+            <StatPill icon={Cpu} text="🧠 AI-graded in seconds" delay={0.4} />
+            <StatPill icon={BarChart3} text="📦 Real-time tracking" delay={0.6} />
           </div>
         </div>
 
