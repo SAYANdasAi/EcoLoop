@@ -1333,10 +1333,10 @@ function ScrollLink({ href, children, className = "", onClick }: ScrollLinkProps
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {[
-              { label: "Devices Restored", value: 18420, suffix: "+" },
-              { label: "Carbon Offset", value: 1420, suffix: " Tons" },
-              { label: "Payouts Issued", value: 18, prefix: "₹", suffix: "M+" },
-              { label: "Mineral Recovery", value: 98, suffix: "%", highlight: true }
+              { label: "Devices Restored", value: 0, suffix: "" },
+              { label: "Carbon Offset", value: 0, suffix: " Tons" },
+              { label: "Payouts Issued", value: 0, prefix: "₹", suffix: "" },
+              { label: "Mineral Recovery", value: 0, suffix: "%", highlight: true }
             ].map((stat, i) => (
               <motion.div 
                 key={i}
